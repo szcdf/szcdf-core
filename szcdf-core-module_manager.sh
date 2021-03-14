@@ -99,8 +99,8 @@ szcdf_module_manager__load() {
   fi
   
   # If optional path parameter exists, try to use it
-  if [[ -n "$2" ]]; then
-    path=$2
+  if [[ -n "$1" ]]; then
+    path=$1
     shift
     szcdf_logging__debug "Checking if module $module exists at custom path $path..."
     if [[ ! -f "$path" ]]; then

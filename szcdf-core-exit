@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+
+# szcdf-core-exit
+
+# =============================================================================
+#beginSnippet Allow sourcing Include Guard
+# Check if being sourced...
+if (return 0 2>/dev/null); then
+  # Check if already included... then no-op.
+  if [[ -n "${g_szcdf_core_included__szcdf_core_exit+x}" ]]; then
+    return
+  else
+    # Otherwise, set the guard
+    readonly g_szcdf_core_included__szcdf_core_exit=1
+  fi
+fi
+#endSnippet Allow sourcing Include Guard
+# =============================================================================
+
+# =============================================================================
+#beginSnippet Pre-Script Safety Features Enable
+# -o errexit (equivalent to -e) -- exit if a line ends with status!=0
+# -o nounset (equivalent to -u) -- exit if referencing undefined variable
+# -o pipefail -- pipeline short circuits if a command has status!=0
+# -o noclobber -- prevents overwriting existing files using output redirect
+set -o errexit -o pipefail -o noclobber -o nounset
+#endSnippet Pre-Script Safety Features Enable
+# =============================================================================
+
+# Success
+readonly szcdf_core_exit__SUCCESS=0
+# Boolean exit codes
+readonly szcdf_core_exit__TRUE=0
+readonly szcdf_core_exit__FALSE=1
+# Non-success informational exit codes
+readonly szcdf_core_exit__SHOW_USAGE=4
+# User error exit codes
+readonly szcdf_core_exit__INVALID_ARGV=5
+readonly szcdf_core_exit__INVALID_DIRECTIVE=6
+# Programming error exit codes
+readonly szcdf_core_exit__INCLUDE_GUARD_NO_SOURCING_ALLOWED=129
+readonly szcdf_core_exit__UNHANDLED_CASE_INPUT=130
+# Other error exit codes
+readonly szcdf_core_exit__INSTALL_CORRUPTED=209
+
+# =============================================================================
+# Cleanup
+
+szcdf_core_exit__destroy() {
+  unset szcdf_core_exit__SUCCESS
+  unset szcdf_core_exit__TRUE
+
+  unset szcdf_core_exit__FALSE
+
+  unset szcdf_core_exit__SHOW_USAGE
+
+  unset szcdf_core_exit__INVALID_ARGV
+  unset szcdf_core_exit__INVALID_DIRECTIVE
+
+  unset szcdf_core_exit__INCLUDE_GUARD_NO_SOURCING_ALLOWED
+  unset szcdf_core_exit__UNHANDLED_CASE_INPUT
+
+  unset szcdf_core_exit__INSTALL_CORRUPTED
+
+  # Unset the destroy proc itself
+  unset -f szcdf_core_exit__destroy
+
+  # Unset include guard
+  unset g_szcdf_core_included__szcdf_core_exit
+}

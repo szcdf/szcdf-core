@@ -1,0 +1,5 @@
+libexec:
+    szcdf-core-adtqueue
+    szcdf-core-adtset
+    szcdf-core-exit
+    szcdf-core-logging

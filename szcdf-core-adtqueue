@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+
+# szcdf-core-adtqueue
+
+# =============================================================================
+#beginSnippet Allow sourcing Include Guard
+# Check if being sourced...
+if (return 0 2>/dev/null); then
+  # Check if already included... then no-op.
+  if [[ -n "${g_szcdf_core_included__szcdf_core_adtqueue+x}" ]]; then
+    return
+  else
+    # Otherwise, set the guard
+    readonly g_szcdf_core_included__szcdf_core_adtqueue=1
+  fi
+fi
+#endSnippet Allow sourcing Include Guard
+# =============================================================================
+
+# =============================================================================
+#beginSnippet Pre-Script Safety Features Enable
+# -o errexit (equivalent to -e) -- exit if a line ends with status!=0
+# -o nounset (equivalent to -u) -- exit if referencing undefined variable
+# -o pipefail -- pipeline short circuits if a command has status!=0
+# -o noclobber -- prevents overwriting existing files using output redirect
+set -o errexit -o pipefail -o noclobber -o nounset
+#endSnippet Pre-Script Safety Features Enable
+# =============================================================================
+
+# Global manual switch for debug mode. Comment/Uncomment for debug mode.
+g_szcdf_core_adtqueue__debug_mode=1
+
+szcdf_core_adtqueue__push() {
+  local p_queue_var="$1"
+  local p_new_element="$2"
+
+  eval $p_queue_var+='( "$p_new_element" )'
+}
+
+szcdf_core_adtqueue__pop() {
+  local p_queue_var="$1"
+  local p_result_var="$2"
+
+  local l_head_element_var="$p_queue_var[0]"
+  local l_all_elements_var="$p_queue_var[@]"
+  local l_head_element="${!l_head_element_var}"
+  local l_tail_elements=( "${!l_tail_elements_var:1}" )
+
+  eval $p_queue_var='( "${l_tail_elements[@]}" )'
+  eval $p_result_var='"$l_head_element"'
+}
+
+szcdf_core_adtqueue__is_empty() {
+  local p_queue_var="$1"
+
+  local l_count_var="$p_queue_var[#]"
+
+  if [[ $l_count_var -eq 0 ]]; then
+    return 0
+  else
+    return -1
+  fi
+}
+
+# Cleanup
+
+szcdf_core_adtqueue__destroy() {
+  unset -f szcdf_core_adtqueue__push
+  unset -f szcdf_core_adtqueue__pop
+  unset -f szcdf_core_adtqueue__is_empty
+
+  unset g_szcdf_core_adtqueue__debug_mode
+
+  # Unset the destroy proc itself
+  unset -f szcdf_core_adtqueue__destroy
+
+  # Unset include guard
+  unset g_szcdf_core_included__szcdf_core_adtqueue
+}

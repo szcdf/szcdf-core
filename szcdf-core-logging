@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+
+# szcdf-core-logging
+
+# =============================================================================
+#beginSnippet Allow sourcing Include Guard
+# Check if being sourced...
+if (return 0 2>/dev/null); then
+  # Check if already included... then no-op.
+  if [[ -n "${g_szcdf_core_included__szcdf_core_logging+x}" ]]; then
+    return
+  else
+    # Otherwise, set the guard
+    readonly g_szcdf_core_included__szcdf_core_logging=1
+  fi
+fi
+#endSnippet Allow sourcing Include Guard
+# =============================================================================
+
+# =============================================================================
+#beginSnippet Pre-Script Safety Features Enable
+# -o errexit (equivalent to -e) -- exit if a line ends with status!=0
+# -o nounset (equivalent to -u) -- exit if referencing undefined variable
+# -o pipefail -- pipeline short circuits if a command has status!=0
+# -o noclobber -- prevents overwriting existing files using output redirect
+set -o errexit -o pipefail -o noclobber -o nounset
+#endSnippet Pre-Script Safety Features Enable
+# =============================================================================
+
+# Global manual switch for debug mode. Comment/Uncomment for debug mode.
+g_szcdf_core_logging__debug_mode=1
+
+# Log Context Control
+
+szcdf_core_logging__begin_context() {
+  g_szcdf_core_logging__curr_context=$1
+  g_szcdf_core_logging__contexts=$1:$g_szcdf_core_logging__contexts
+}
+
+szcdf_core_logging__end_context() {
+  g_szcdf_core_logging__contexts=$(echo "$g_szcdf_core_logging__contexts" | cut -d ":" -f2-)
+  g_szcdf_core_logging__curr_context=$(echo "$g_szcdf_core_logging__contexts" | cut -d ":" -f1)
+}
+
+# Log Output
+
+szcdf_core_logging__debug() {
+  if [[ -n "${g_IS_DEBUG+x}" ]] || [[ -n "${g_szcdf_core_logging__debug_mode+x}" ]]; then
+    echo >&2 "[SZCDF][$(date -Iseconds)][DEBUG][$g_szcdf_core_logging__curr_context] $@"
+  fi
+}
+
+szcdf_core_logging__info() {
+  echo >&2 "[SZCDF][$(date -Iseconds)][INFO][$g_szcdf_core_logging__curr_context] $@"
+}
+
+szcdf_core_logging__warn() {
+  echo >&2 "$(tput setaf 3)[SZCDF][$(date -Iseconds)][WARN][$g_szcdf_core_logging__curr_context] $@$(tput sgr0)"
+}
+
+szcdf_core_logging__error() {
+  echo >&2 "$(tput setaf 1)[SZCDF][$(date -Iseconds)][ERROR][$g_szcdf_core_logging__curr_context] $@$(tput sgr0)"
+}
+
+# Cleanup
+
+szcdf_core_logging__destroy() {
+  unset -f szcdf_core_logging__begin_context
+  unset -f szcdf_core_logging__end_context
+
+  unset -f szcdf_core_logging__debug
+  unset -f szcdf_core_logging__info
+  unset -f szcdf_core_logging__warn
+  unset -f szcdf_core_logging__error
+
+  unset g_szcdf_core_logging__contexts
+  unset g_szcdf_core_logging__curr_context
+  unset g_szcdf_core_logging__debug_mode
+
+  # Unset the destroy proc itself
+  unset -f szcdf_core_logging__destroy
+
+  # Unset include guard
+  unset g_szcdf_core_included__szcdf_core_logging
+}
+
+# Initialize runtime vars
+g_szcdf_core_logging__contexts=base
+g_szcdf_core_logging__curr_context=$(echo "$g_szcdf_core_logging__contexts" | cut -d ":" -f1)

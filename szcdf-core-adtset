@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+
+# szcdf-core-adtset
+
+# =============================================================================
+#beginSnippet Allow sourcing Include Guard
+# Check if being sourced...
+if (return 0 2>/dev/null); then
+  # Check if already included... then no-op.
+  if [[ -n "${g_szcdf_core_included__szcdf_core_adtset+x}" ]]; then
+    return
+  else
+    # Otherwise, set the guard
+    readonly g_szcdf_core_included__szcdf_core_adtset=1
+  fi
+fi
+#endSnippet Allow sourcing Include Guard
+# =============================================================================
+
+# =============================================================================
+#beginSnippet Pre-Script Safety Features Enable
+# -o errexit (equivalent to -e) -- exit if a line ends with status!=0
+# -o nounset (equivalent to -u) -- exit if referencing undefined variable
+# -o pipefail -- pipeline short circuits if a command has status!=0
+# -o noclobber -- prevents overwriting existing files using output redirect
+set -o errexit -o pipefail -o noclobber -o nounset
+#endSnippet Pre-Script Safety Features Enable
+# =============================================================================
+
+# Global manual switch for debug mode. Comment/Uncomment for debug mode.
+g_szcdf_core_adtset__debug_mode=1
+
+szcdf_core_adtset__add() {
+  local p_set_var="$1"
+  local p_new_element="$2"
+  local l_set_new_element_var="$p_set_var[$p_new_element]"
+  eval $l_set_new_element_var=1
+}
+
+szcdf_core_adtset__is_in() {
+  local p_set_var="$1"
+  local p_check_element="$2"
+  local l_set_check_element_var="$p_set_var[$p_check_element]"
+  if [[ -n "${!l_set_check_element_var+x}" ]]; then
+    return 0
+  else
+    return -1
+  fi
+}
+
+# Cleanup
+
+szcdf_core_adtset__destroy() {
+  unset -f szcdf_core_adtset__add
+  unset -f szcdf_core_adtset__is_in
+
+  unset g_szcdf_core_adtset__debug_mode
+
+  # Unset the destroy proc itself
+  unset -f szcdf_core_adtset__destroy
+
+  # Unset include guard
+  unset g_szcdf_core_included__szcdf_core_adtset
+}

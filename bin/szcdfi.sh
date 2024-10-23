@@ -13,19 +13,39 @@ ERROR_FATAL=1
 RC_SPEC_DIRECTIVE_UNKNOWN=64
 RC_SPEC_DIRECTIVE_EMPTY=65
 RC_SPEC_DIRECTIVE_COMMENT=66
+RC_SPEC_DIRECTIVE_BADARGS=67
 
 
 ######### MAIN ################################################################
 
 szcdf_install__main() {
-  SCRIPT_DIR="$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)"
+  # Determine directory of running script
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  
+  # Determine directory of SZCDF configuration files
+  local DOT_CONFIG_SZCDF_PATH="$HOME/.config/szcdf"
+  local DOT_SZCDF_PATH="$HOME/.szcdf"
+  if [[ -d "$DOT_CONFIG_SZCDF_PATH" ]]; then
+    CONFIG_ROOT="$DOT_CONFIG_SZCDF_PATH"
+  elif [[ -d "$DOT_SZCDF_PATH" ]]; then
+    CONFIG_ROOT="$DOT_SZCDF_PATH"
+  elif [[ -e "$DOT_CONFIG_SZCDF_PATH" ]] && [[ -e "$DOT_SZCDF_PATH" ]]; then
+    szcdf_install__display_error "Error: SZCDF config directory $DOT_CONFIG_SZCDF_PATH exists and is not a directory!"
+    return $ERROR_FATAL
+  elif [[ -e "$DOT_CONFIG_SZCDF_PATH" ]]; then
+    mkdir -p "$DOT_SZCDF_PATH"
+    CONFIG_ROOT="$DOT_SZCDF_PATH"
+  else
+    mkdir -p "$DOT_CONFIG_SZCDF_PATH"
+    CONFIG_ROOT="$DOT_CONFIG_SZCDF_PATH"
+  fi
 
   # Parse user-entered args
   while [[ $# -gt 0 ]]; do
     local arg=$1
     shift
     case "$arg" in
-      -i|--package-dir)
+      -p|--package-dir)
         if [[ $# -gt 0 ]]; then
           PKG_DIR="$1"
           shift
@@ -86,7 +106,7 @@ szcdf_install__main() {
   # If package dir was provided, but the spec file was not,
   # then use the package dir to deduce a likely spec file
   elif [[ -n "$PKG_DIR" ]] && [[ -z "$INSTALL_SPEC_FILE" ]]; then
-    INSTALL_SPEC_FILE="$PKG_DIR/.szcdf/szcdf_package.szcdfis"
+    INSTALL_SPEC_FILE="$(szcdf_install__get_default_spec_file_from_pkg_dir "$PKG_DIR")"
     
     if [[ ! -f "$INSTALL_SPEC_FILE" ]]; then
       return $ERROR_FATAL
@@ -95,21 +115,27 @@ szcdf_install__main() {
   # If neither are provided, use defaults
   elif [[ -z "$PKG_DIR" ]] && [[ -z "$INSTALL_SPEC_FILE" ]]; then
     PKG_DIR="$(pwd)"
-    INSTALL_SPEC_FILE="$(szcdf_install__get_default_spec_file_from_pkg_dir $PKG_DIR)"
+    INSTALL_SPEC_FILE="$(szcdf_install__get_default_spec_file_from_pkg_dir "$PKG_DIR")"
 
     # Check ancestor dirs until we find a valid package directory
     while [[ ! -f "$INSTALL_SPEC_FILE" ]]; do
-      local new_pkg_dir="$(dirname $PKG_DIR)"
+      local new_pkg_dir
+      new_pkg_dir="$(dirname "$PKG_DIR")"
       # If parent of current dir is unavailable, we went all the way to the root dir
       # so no package dir can be found
       if [[ "$new_pkg_dir" == "$PKG_DIR" ]]; then
         return $ERROR_FATAL
       fi
       PKG_DIR="$new_pkg_dir"
-      INSTALL_SPEC_FILE="$(szcdf_install__get_default_spec_file_from_pkg_dir $PKG_DIR)"
+      INSTALL_SPEC_FILE="$(szcdf_install__get_default_spec_file_from_pkg_dir "$PKG_DIR")"
     done
 
   # Otherwise, use the user-inputted values
+  fi
+
+  # Use interactive if not specified
+  if [[ -z "$IS_INTERACTIVE" ]]; then
+    IS_INTERACTIVE=1
   fi
 
   # Display intro
@@ -157,10 +183,9 @@ szcdf_install__quick_install() {
   local preview
   local preview_rc
   local execution_rc
-  local instatus
-  while instatus= read -r -u 3 line
+  while instatus='' read -r -u 3 line
   do
-    preview="$(szcdf_install__preview_spec_command $line)"
+    preview="$(szcdf_install__preview_spec_command "$line")"
     preview_rc=$?
     if [[ $preview_rc -eq $RC_SPEC_DIRECTIVE_EMPTY ]]; then
       continue
@@ -172,7 +197,7 @@ szcdf_install__quick_install() {
       echo "An error was encountered when previewing install spec file: $preview_rc"
       return $ERROR_FATAL
     fi
-    echo $preview
+    echo "$preview"
   done 3<"$INSTALL_SPEC_FILE"
   unset instatus
 
@@ -186,8 +211,7 @@ szcdf_install__quick_install() {
   echo ""
   echo "Installing..."
 
-  local instatus
-  while instatus= read -r -u 3 line
+  while instatus='' read -r -u 3 line
   do
     szcdf_install__execute_spec_command "$line"
     execution_rc=$?
@@ -209,11 +233,10 @@ szcdf_install__custom_install() {
   local preview
   local preview_rc
   local execution_rc
-  local instatus
   local step_counter=1
-  while instatus= read -r -u 3 line
+  while instatus='' read -r -u 3 line
   do
-    preview="$(szcdf_install__preview_spec_command $line)"
+    preview="$(szcdf_install__preview_spec_command "$line")"
     preview_rc=$?
     if [[ $preview_rc -eq $RC_SPEC_DIRECTIVE_EMPTY ]]; then
       continue
@@ -227,10 +250,10 @@ szcdf_install__custom_install() {
     fi
     echo ""
     echo "[Step $step_counter]"
-    echo $preview
+    echo "$preview"
     if ! szcdf_install__prompt_confirmation_is_yes "Run?"; then
-      echo "Skipping..."
-      step_counter=$(($step_counter + 1))
+      echo "Skipping"
+      step_counter=$((step_counter + 1))
       continue
     fi
     echo "Processing..."
@@ -240,7 +263,7 @@ szcdf_install__custom_install() {
       echo "An error was encountered when executing install spec file: $execution_rc"
       return $ERROR_FATAL
     fi
-    step_counter=$(($step_counter + 1))
+    step_counter=$((step_counter + 1))
   done 3< "$INSTALL_SPEC_FILE"
   unset instatus
 
@@ -252,82 +275,61 @@ szcdf_install__custom_install() {
 ######### PROMPTS #############################################################
 
 szcdf_install__prompt_install_mode() {
+  local -n install_mode_var=$1
   local prompt_text="Choose an option [1 or 2]:"
   echo -en "$prompt_text "
-  read install_mode
-  local isLoop=true
-  while $isLoop; do
+  read -r install_mode
+  while true; do
     case $install_mode in
       1|2)
-        isLoop=false
+        break
         ;;
       *)
         echo "Invalid input"
         echo -en "$prompt_text "
-        read install_mode
+        read -r install_mode
         ;;
     esac
   done
-  declare -g "$1=$install_mode"
+  install_mode_var=$install_mode
 }
 
 szcdf_install__prompt_confirmation_is_yes() {
   local prompt_text=$1
   echo -en "$prompt_text [$(tput setaf 2)Y$(tput sgr0)/$(tput setaf 1)n$(tput sgr0)]: "
-  read user_confirm
-  local isLoop=true
-  while $isLoop; do
+  read -r user_confirm
+  while true; do
     case $user_confirm in
       [yY]|[yY][eE][sS])
-        ret=0
-        isLoop=false
+        return 0
         ;;
       [nN]|[nN][oO])
-        ret=1
-        isLoop=false
+        return 1
         ;;
       *)
         echo "Invalid input"
         echo -en "$prompt_text [$(tput setaf 2)Y$(tput sgr0)/$(tput setaf 1)n$(tput sgr0)]: "
-        read user_confirm
+        read -r user_confirm
         ;;
     esac
   done
-  return $ret
 }
 
 
 ######### PREVIEW #############################################################
 
 szcdf_install__preview_spec_command() {
-  # local line="$(echo "$1" | sed 's/\\r$//g')"
-  # local directive="$(echo "$line" | awk '{print $1;}')"
   local directive=$1
   shift
   case $directive in
     COPY)
-      szcdf_install__preview_copy $@
+      szcdf_install__preview_copy "$@"
       ;;
-    # GITCLONE)
-    #   git_repo="$(echo "$line" | awk '{print $2;}')"
-    #   clone_target="$(echo "$line" | awk '{print $3;}')"
-    #   szcdf_install__display_output "Clone git repo: $git_repo -> CONFIG_ROOT:/$clone_target"
-    #   return 0
-    #   ;;
-    # vimcmd)
-    #   vim_cmds="$(echo "$line" | awk '{$1=""; print $0;}')"
-    #   vim_cmds="$(echo "$line" | awk '{$1=""; print $0;}' | sed -E 's/([^[:space:]]+)/+\1/g')"
-    #   szcdf_install__display_output "Run commands in vim: $vim_cmds"
-    #   return 0
-    #   ;;
-    # shell)
-    #   shell_cmd="$(echo "$line" | awk '{$1=""; print $0;}')"
-    #   szcdf_install__display_output "Run shell command: $shell_cmd"
-    #   return 0
-    #   ;;
-    EXTENDHEAD)
+    PREPENDTEXT)
+      szcdf_install__preview_prependtext "$@"
       ;;
-    EXTENDTAIL)
+    APPENDTEXT)
+      szcdf_install__preview_appendtext "$@"
       ;;
     \#*)
       return $RC_SPEC_DIRECTIVE_COMMENT
@@ -336,52 +338,222 @@ szcdf_install__preview_spec_command() {
       return $RC_SPEC_DIRECTIVE_EMPTY
       ;;
     *)
-      szcdf_install__display_warning "Unknown directive \"$directive\" will be ignored"
+      szcdf_install__display_warning "Unknown directive \"$directive\" will be ignored."
       return $RC_SPEC_DIRECTIVE_UNKNOWN
       ;;
   esac
 }
 
 szcdf_install__preview_copy() {
+  # Parse args
   local source_
   local dest_
   while [[ $# -gt 0 ]]; do
     local arg=$1
     shift
     case "$arg" in
-      *) # Positional
+      # Positional
+      *)
         if [[ -z "$source_" ]]; then
-          source_=$arg
+          source_=$arg # required
         elif [[ -z "$dest_" ]]; then
-          dest_=$arg
+          dest_=$arg # required
         fi
         ;;
     esac
   done
-  szcdf_install__display_output "Copy file(s): $PKG_DIR/$source_ -> $dest_"
+  
+  local badargs=0
+  if [[ -z "$source_" ]]; then
+    szcdf_install__display_warning "Required arg <source> missing for COPY directive."
+    badargs=1
+  fi
+  if [[ -z "$dest_" ]]; then
+    szcdf_install__display_warning "Required arg <dest> missing for COPY directive."
+    badargs=1
+  fi
+
+  if [[ $badargs == 1 ]]; then
+    return $RC_SPEC_DIRECTIVE_BADARGS
+  fi
+
+  szcdf_install__display_output "Copy file(s) from $PKG_DIR/$source_ to $dest_"
 }
 
+szcdf_install__preview_prependtext() {
+  # Parse args
+  local source_
+  local dest_
+  local section_id
+  local comment_indicator
+  while [[ $# -gt 0 ]]; do
+    local arg=$1
+    shift
+    case "$arg" in
+      # Positional
+      *)
+        if [[ -z "$source_" ]]; then
+          source_=$arg # required
+        elif [[ -z "$dest_" ]]; then
+          dest_=$arg # required
+        elif [[ -z "$section_id" ]]; then
+          section_id=$arg # required
+        elif [[ -z "$comment_indicator" ]]; then
+          comment_indicator=$arg # optional
+        fi
+        ;;
+    esac
+  done
+
+  local badargs=0
+  if [[ -z "$source_" ]]; then
+    szcdf_install__display_warning "Required arg <source> missing for PREPENDTEXT directive."
+    badargs=1
+  fi
+  if [[ -z "$dest_" ]]; then
+    szcdf_install__display_warning "Required arg <dest> missing for PREPENDTEXT directive."
+    badargs=1
+  fi
+  if [[ -z "$section_id" ]]; then
+    szcdf_install__display_warning "Required arg <section_id> missing for PREPENDTEXT directive."
+    badargs=1
+  fi
+  if [[ -z "$comment_indicator" ]]; then
+    comment_indicator='#' # Default to shell comment indicator
+  fi
+
+  if [[ $badargs = 1 ]]; then
+    return $RC_SPEC_DIRECTIVE_BADARGS
+  fi
+
+  szcdf_install__display_output "Prepend text from $PKG_DIR/$source_ to $dest_ with ID=$section_id if section doesn't exist."
+}
+
+szcdf_install__preview_appendtext() {
+  # Parse args
+  local source_
+  local dest_
+  local section_id
+  local comment_indicator
+  while [[ $# -gt 0 ]]; do
+    local arg=$1
+    shift
+    case "$arg" in
+      # Positional
+      *)
+        if [[ -z "$source_" ]]; then
+          source_=$arg # required
+        elif [[ -z "$dest_" ]]; then
+          dest_=$arg # required
+        elif [[ -z "$section_id" ]]; then
+          section_id=$arg # required
+        elif [[ -z "$comment_indicator" ]]; then
+          comment_indicator=$arg # optional
+        fi
+        ;;
+    esac
+  done
+
+  local badargs=0
+  if [[ -z "$source_" ]]; then
+    szcdf_install__display_warning "Required arg <source> missing for APPENDTEXT directive."
+    badargs=1
+  fi
+  if [[ -z "$dest_" ]]; then
+    szcdf_install__display_warning "Required arg <dest> missing for APPENDTEXT directive."
+    badargs=1
+  fi
+  if [[ -z "$section_id" ]]; then
+    szcdf_install__display_warning "Required arg <section_id> missing for APPENDTEXT directive."
+    badargs=1
+  fi
+  if [[ -z "$comment_indicator" ]]; then
+    comment_indicator='#' # Default to shell comment indicator
+  fi
+
+  if [[ $badargs == 1 ]]; then
+    return $RC_SPEC_DIRECTIVE_BADARGS
+  fi
+
+  szcdf_install__display_output "Append text from $PKG_DIR/$source_ to $dest_ with ID=$section_id if section doesn't exist."
+}
 
 ######### EXECUTOR ############################################################
 
 szcdf_install__execute_spec_command() {
-  :
-  # local line="$(echo "$1" | sed 's/\\r$//g')"
-  # local directive="$(echo "$line" | awk '{print $1;}')" 
-  # case $directive in
+  local directive=$1
+  shift
+  case $directive in
+    COPY)
+      szcdf_install__execute_copy "$@"
+      ;;
+    \#*)
+      return $RC_SPEC_DIRECTIVE_COMMENT
+      ;;
+    "")
+      return $RC_SPEC_DIRECTIVE_EMPTY
+      ;;
+    *)
+      return $RC_SPEC_DIRECTIVE_UNKNOWN
+      ;;
+  esac
+}
+
+szcdf_install__execute_copy() {
+  # Parse args
+  local source_
+  local dest_
+  while [[ $# -gt 0 ]]; do
+    local arg=$1
+    shift
+    case "$arg" in
+      # Positional
+      *)
+        if [[ -z "$source_" ]]; then
+          source_=$arg # required
+        elif [[ -z "$dest_" ]]; then
+          dest_=$arg # required
+        fi
+        ;;
+    esac
+  done
+
+  # Substitute to resolve config root
+  dest_=${dest_//\$CONFIG_ROOT/$CONFIG_ROOT}
+
+  # Check if destination already exists
+  if [[ -e "$dest_" ]]; then
+    old_link_target="$(readlink -f "$dest_")"
+    # Check old target is the same as new target
+    if [[ "$old_link_target" == "$PKG_DIR/$source_" ]]; then
+      # If they are equal, skip
+      szcdf_install__display_output "Link '$dest_' exists and already points to '$PKG_DIR/$source_'. Skipping"
+      return 0
+    fi
+    # Check with the user if they want to replace it
+    local prompt_text
+    prompt_text=$(echo -en \
+      "$(szcdf_install__display_output "The installer wants to replace the file '$dest_':")""\n"\
+      "$(szcdf_install__display_output_append "Old target: $(tput setaf 1)$old_link_target$(tput sgr0)")""\n"\
+      "$(szcdf_install__display_output_append "New target: $(tput setaf 2)$PKG_DIR/$source_$(tput sgr0)")""\n"\
+      "$(szcdf_install__display_output_append "Replace?")"\
+    )
+    if ! szc_i_install__prompt_confirmation "$prompt_text"; then
+      szcdf_install__display_warning "$dest_ will not be created."
+      return
+    fi
+    # Finally, if pass all checks, then proceed
+    # Remove the old link
+    rm "$dest_"
+  fi
+  # Check to see if directory exists, otherwise make a directory
+  if [[ ! -e "$(dirname "$dest_")" ]]; then
+    mkdir -p "$(dirname "$dest_")"
+  fi
+  # Create the link
+  ln -vs "$PKG_DIR/$source_" "$dest_"
+}
   #   softln)
-  #     target="$(echo "$line" | awk '{print $2;}')"
-  #     link="$(echo "$line" | awk '{print $3;}')"
-  #     hostname_override="$(echo "$line" | awk '{print $4;}')" # optional
-  #     # Check if file for hostname_override exists
-  #     if [[ -z "$hostname_override" ]] && [[ -e "$ROOT_DIR/$target.$HOSTNAME" ]]; then
-  #       # Doesn't exist, so check if default hostname exists
-  #       # If it exists, set target to that
-  #       target="$target.$HOSTNAME"
-  #     elif [[ -e "$ROOT_DIR/$target.$hostname_override" ]]; then
-  #       # hostname_override file exists, so set target to that
-  #       target="$target.$hostname_override"
-  #     fi
   #     # Check if file already exists
   #     if [[ -e "$HOME/$link" ]]; then
   #       old_target="$(readlink -f "$HOME/$link")"
@@ -390,7 +562,7 @@ szcdf_install__execute_spec_command() {
   #         # If they are equal, skip
   #         szcdf_install__display_output "Softlink '$HOME/$link' exists"
   #         szcdf_install__display_output_append "and correctly points to '$ROOT_DIR/$target'."
-  #         szcdf_install__display_output_append "Skipping..."
+  #         szcdf_install__display_output_append "Skipping"
   #         return
   #       fi
   #       # Check with the user if he/she wants to replace it
@@ -425,11 +597,6 @@ szcdf_install__execute_spec_command() {
   #     vim $vim_cmds - < /dev/null
   #     echo "Exited vim."
   #     ;;
-  #   shell)
-  #     shell_cmd="$(echo "$line" | awk '{$1=""; print $0;}')"
-  #     #$shell_cmd
-  #     szcdf_install__display_warning "Due to security reasons, running shell commands has been disabled"
-  #     ;;
   #   \;*)
   #     ;;
   #   "")
@@ -440,7 +607,6 @@ szcdf_install__execute_spec_command() {
   #     szcdf_install__display_warning "Unknown directive \"$line\""
   #     ;;
   # esac
-}
 
 
 ######### DISPLAY #############################################################
@@ -458,6 +624,9 @@ szcdf_install__display_intro() {
   echo "The installer specification file being used:"
   echo "$INSTALL_SPEC_FILE"
   echo ""
+  echo "The SZCDF configuration directory:"
+  echo "$CONFIG_ROOT"
+  echo ""
   echo "There are two modes of installation:"
   echo "[1] Quick Install  - Preview all changes and install"
   echo "                     with one click. Conflicts will"
@@ -472,14 +641,18 @@ szcdf_install__display_output() {
 }
 
 szcdf_install__display_output_append() {
-  echo "    $@"
+  echo "    $*"
 }
 
 szcdf_install__display_warning() {
-  echo "$(tput setaf 3)$@$(tput sgr0)"
+  echo "$(tput setaf 3)$*$(tput sgr0)"
+}
+
+szcdf_install__display_error() {
+  echo "$(tput setaf 1)$*$(tput sgr0)"
 }
 
 
 ######### RUN #################################################################
 
-szcdf_install__main $@
+szcdf_install__main "$@"

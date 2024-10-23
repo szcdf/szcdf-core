@@ -115,11 +115,7 @@ szcdf_profile__load() {
   shift
   #TODO: Move checks and flag settings to somewhere else (modularize)
   # Check interactivity
-  if [[ $- == *i* ]]; then
-    export SZCDF_PROFILE__IS_INTERACTIVE=1
-  else
-    export SZCDF_PROFILE__IS_INTERACTIVE=
-  fi
+  szcdf_shinter detect_and_set_is_interactive
   # Check if login-shell
   #TODO: Smarter bespoke checks for login-shell
   if [[ "$SZCDF_G__ENTRY_POINT" == *profile ]]; then

@@ -1,0 +1,8 @@
+services:
+  szcdf-installer-test:
+    build:
+      context: installer
+      args:
+        user_pass: ahamilton
+    volumes:
+      - ../../:/szcdf_regi

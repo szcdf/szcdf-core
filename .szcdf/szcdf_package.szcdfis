@@ -1,0 +1,31 @@
+###############################################################################
+#
+# szcdf_package.szcdfis
+# Stephen Zhao
+
+# === bootstrapping ===
+COPY src/core-startup/_bootstrap.sh $CONFIG_ROOT/_bootstrap.sh
+
+# === SZCDF environment configuration ===
+COPY src/core-startup/configureenv.sh $CONFIG_ROOT/configureenv.sh
+
+# === SZCDF core modules ===
+COPY src/core-modules/logging.sh $CONFIG_ROOT/logging.sh
+COPY src/core-modules/module_manager.sh $CONFIG_ROOT/module_manager.sh
+COPY src/core-modules/profile.sh $CONFIG_ROOT/profile.sh
+COPY src/core-modules/preset.sh $CONFIG_ROOT/preset.sh
+COPY src/core-modules/shinter.sh $CONFIG_ROOT/shinter.sh
+
+# === SZCDF core profiles ===
+COPY src/core-profiles/default $CONFIG_ROOT/profile.d/default
+
+# === SZCDF core presets ===
+COPY src/core-presets/bash-recommended $CONFIG_ROOT/preset.d/bash-recommended
+COPY src/core-presets/prompt-standard $CONFIG_ROOT/preset.d/prompt-standard
+
+# === SZCDF entries ===
+# Add entrypoint calls to all appropriate bash run-command scripts
+PREPENDTEXT src/core-entries/entry-bash.sh .profile ENTRY-BASH
+PREPENDTEXT src/core-entries/entry-bash.sh .bash_profile ENTRY-BASH
+PREPENDTEXT src/core-entries/entry-bash.sh .bashrc ENTRY-BASH
+

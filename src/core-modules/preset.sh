@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 ###############################################################################
 #
-# szcdf-core-preset.sh
+# szcdf_module
+# preset.sh
 # Stephen Zhao
 
 # This module can be used to define and handle presets.

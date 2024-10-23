@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 ###############################################################################
 #
-# szcdf-core-module_manager.sh
+# szcdf_module
+# module.sh
 # Stephen Zhao
 
 # This is a module that manages the use of modules.

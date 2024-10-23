@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 ###############################################################################
 #
-# szcdf-core-logging.sh
+# szcdf_module
+# logging.sh
 # Stephen Zhao
 
 # To load this module, run

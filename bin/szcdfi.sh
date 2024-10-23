@@ -538,7 +538,7 @@ szcdf_install__execute_copy() {
       "$(szcdf_install__display_output_append "New target: $(tput setaf 2)$PKG_DIR/$source_$(tput sgr0)")""\n"\
       "$(szcdf_install__display_output_append "Replace?")"\
     )
-    if ! szc_i_install__prompt_confirmation "$prompt_text"; then
+    if ! szcdf_install__prompt_confirmation_is_yes "$prompt_text"; then
       szcdf_install__display_warning "$dest_ will not be created."
       return
     fi
@@ -572,7 +572,7 @@ szcdf_install__execute_copy() {
   #         $(szcdf_install__display_output_append "New target: $(tput setaf 2)$ROOT_DIR/$target$(tput sgr0)")"\n"\
   #         $(szcdf_install__display_output_append "Replace?")\
   #       )
-  #       if ! szc_i_install__prompt_confirmation "$prompt_text"; then
+  #       if ! szcdf_install__prompt_confirmation_is_yes "$prompt_text"; then
   #         szcdf_install__display_warning "$HOME/$link will not be created."
   #         return
   #       fi

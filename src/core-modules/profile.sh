@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 ###############################################################################
 #
-# szcdf-core-profile.sh
+# szcdf_module
+# profile.sh
 # Stephen Zhao
 
 # This module can be used to define and handle profiles.

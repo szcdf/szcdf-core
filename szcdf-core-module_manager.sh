@@ -20,10 +20,10 @@ szcdf_module_manager() {
 
   case $subcommand in
     load)
-      szcdf_module_manager__load $@
+      szcdf_module_manager__load "$@"
       ;;
     is_loaded)
-      szcdf_module_manager__is_loaded $@
+      szcdf_module_manager__is_loaded "$@"
       ;;
     unload_all_loaded)
       szcdf_module_manager__unload_all_loaded
@@ -94,7 +94,7 @@ szcdf_module_manager__load() {
 
   # Check if the module is already loaded
   if [[ ${SZCDF_MODULE__IS_LOADED[$module]+_} ]] || [[ ${SZCDF_MODULE__IS_LOADING[$module]+_} ]]; then
-    szcdf_logging__warning "Module $module is already loaded. Skipping..."
+    szcdf_logging__warning "Module $module is already loaded. Skipping"
     return 1
   fi
   
@@ -135,7 +135,7 @@ szcdf_module_manager__load() {
     SZCDF_MODULE__IS_SOURCING[$module]=1
     source "$script"
     SZCDF_MODULE__IS_SOURCED[$module]=1
-    unset SZCDF_MODULE__IS_SOURCING[$module]
+    unset 'SZCDF_MODULE__IS_SOURCING[$module]'
     szcdf_logging__debug "Finished sourcing module $module."
   fi
 
@@ -147,22 +147,22 @@ szcdf_module_manager__load() {
     szcdf_logging__debug "Module $module needs to be inited."
 
     szcdf_logging__debug "Checking if module $module has an init function..."
-    if [[ "$(type -t szcdf_${module}__init)" != 'function' ]]; then
+    if [[ "$(type -t szcdf_"$module"__init)" != 'function' ]]; then
       szcdf_logging__debug "Module $module does not have an init function. Skipping init..."
     else
       szcdf_logging__debug "Initializing module $module..."
       SZCDF_MODULE__IS_INITING[$module]=1
-      szcdf_${module}__init
+      szcdf_"$module"__init
       SZCDF_MODULE__IS_INITED[$module]=1
-      unset SZCDF_MODULE__IS_INITING[$module]
+      unset 'SZCDF_MODULE__IS_INITING[$module]'
       szcdf_logging__debug "Finished initializing module $module."
     fi
   fi
 
   # Mark module as loaded and push onto stack of loaded modules
   SZCDF_MODULE__IS_LOADED[$module]=1
-  unset SZCDF_MODULE__IS_LOADING[$module]
-  SZCDF_MODULES_LOADED=( $module ${SZCDF_MODULES_LOADED[@]} )
+  unset 'SZCDF_MODULE__IS_LOADING[$module]'
+  SZCDF_MODULES_LOADED=( "$module" "${SZCDF_MODULES_LOADED[@]}" )
 }
 
 # Unloads all loaded modules in reverse order of load.
@@ -186,18 +186,18 @@ szcdf_module_manager__unload_impl() {
   fi
 
   # Run optional cleanup function for the module
-  if [[ "$(type -t szcdf_${module}__cleanup)" != 'function' ]]; then
+  if [[ "$(type -t szcdf_"$module"__cleanup)" != 'function' ]]; then
     szcdf_logging__debug "Cleanup function does not exist for module $module. Skipping cleanup..."
   else
     szcdf_logging__debug "Cleaning up module $module..."
-    szcdf_${module}__cleanup
+    szcdf_"$module"__cleanup
     szcdf_logging__debug "Finished cleaning up module $module."
   fi
 
   # Mark as unloaded
-  unset SZCDF_MODULE__IS_INITED[$module]
-  unset SZCDF_MODULE__IS_SOURCED[$module]
-  unset SZCDF_MODULE__IS_LOADED[$module]
+  unset 'SZCDF_MODULE__IS_INITED[$module]'
+  unset 'SZCDF_MODULE__IS_SOURCED[$module]'
+  unset 'SZCDF_MODULE__IS_LOADED[$module]'
 }
 
 

@@ -14,7 +14,7 @@
 ######### MAIN ################################################################
 
 # $# >= 1
-# $1 = register | prepare_all_registered | load_all_prepared
+# $1 = register | prepare_all_registered | load_all_prepared | is_loaded
 # $:2 = additional args depending on subcommand
 szcdf_preset() {
   szcdf_logging__begin_context 'szcdf_preset'
@@ -24,7 +24,7 @@ szcdf_preset() {
 
   case $subcommand in
     register)
-      szcdf_preset__register $@
+      szcdf_preset__register "$@"
       ;;
     prepare_all_registered)
       szcdf_preset__prepare_all_registered
@@ -32,8 +32,11 @@ szcdf_preset() {
     load_all_prepared)
       szcdf_preset__load_all_prepared
       ;;
+    is_loaded)
+      szcdf_preset__is_loaded "$@"
+      ;;
     *)
-      szcdf_logging__warning "Invalid arguments: $@"
+      szcdf_logging__warning "Invalid arguments: $*"
       szcdf_preset__usage
   esac
 
@@ -73,6 +76,11 @@ szcdf_preset__register() {
   fi
   local preset_name=$1
   shift
+  # Check if preset is already registered
+  if [[ "${SZCDF_PRESET__IS_REGISTERED[$preset_name]+_}" == 1 ]]; then
+    szcdf_logging__warning "Preset '$preset_name' is already registered. Skipping."
+    return
+  fi
   # Check if preset dir exists
   local preset_dir="$SZCDF_G__ROOT_DIR/preset.d/$preset_name" 
   if [[ ! -d  "$preset_dir" ]]; then
@@ -81,7 +89,7 @@ szcdf_preset__register() {
   fi
   szcdf_logging__debug "Registering preset '$preset_name'..."
   # Enqueue the preset for processing
-  SZCDF_PRESET__REGISTERED_PRESETS=( ${SZCDF_PRESET__REGISTERED_PRESETS[@]} $preset_name )
+  SZCDF_PRESET__REGISTERED_PRESETS=( "${SZCDF_PRESET__REGISTERED_PRESETS[@]}" "$preset_name" )
   SZCDF_PRESET__IS_REGISTERED[$preset_name]=1
   szcdf_logging__debug "Finished registering preset '$preset_name'."
 }
@@ -106,7 +114,7 @@ szcdf_preset__prepare_all_registered() {
       continue
     fi
     # Do the preparing
-    szcdf_preset__prepare_impl $preset_name
+    szcdf_preset__prepare_impl "$preset_name"
   done
   szcdf_logging__debug "Finished preparing all registered presets."
 }
@@ -122,7 +130,7 @@ szcdf_preset__prepare() {
   fi
   local preset_name=$1
   shift
-  szcdf_preset__prepare_impl $preset_name
+  szcdf_preset__prepare_impl "$preset_name"
 }
 
 # PRIVATE: Prepares the specified preset, impl
@@ -135,7 +143,7 @@ szcdf_preset__prepare_impl() {
 
   # Check if already prepared
   if [[ ${SZCDF_PRESET__IS_PREPARED[$preset_name]+_} ]]; then
-    szcdf_logging__debug "Preset '$preset_name' is already prepared. Skipping..."
+    szcdf_logging__debug "Preset '$preset_name' is already prepared. Skipping."
   fi
 
   szcdf_logging__debug "Preparing preset '$preset_name'..."
@@ -153,7 +161,7 @@ szcdf_preset__prepare_impl() {
   fi
 
   # Label preset as prepared
-  SZCDF_PRESET__PREPARED_PRESETS=( ${SZCDF_PRESET__PREPARED_PRESETS[@]} $preset_name )
+  SZCDF_PRESET__PREPARED_PRESETS=( "${SZCDF_PRESET__PREPARED_PRESETS[@]}" "$preset_name" )
   SZCDF_PRESET__IS_PREPARED[$preset_name]=1
 
   szcdf_logging__debug "Finished preparing preset '$preset_name'."
@@ -183,7 +191,7 @@ szcdf_preset__load_all_prepared() {
       continue
     fi
     # Run the pre-any-load scripts
-    szcdf_preset__run_load_stage $preset_name 1 'before-any-load'
+    szcdf_preset__run_load_stage "$preset_name" 1 'before-any-load'
   done
   szcdf_logging__debug "Finished running before-any-load scripts for all prepared presets."
 
@@ -195,7 +203,7 @@ szcdf_preset__load_all_prepared() {
       continue
     fi
     # Run the on-load scripts
-    szcdf_preset__run_load_stage $preset_name 2 'on-load'
+    szcdf_preset__run_load_stage "$preset_name" 2 'on-load'
   done
   szcdf_logging__debug "Finished running on-load scripts for all prepared presets."
 
@@ -207,128 +215,128 @@ szcdf_preset__load_all_prepared() {
       continue
     fi
     # Run the post-all-load scripts
-    szcdf_preset__run_load_stage $preset_name 3 'after-all-load'
+    szcdf_preset__run_load_stage "$preset_name" 3 'after-all-load'
   done
   szcdf_logging__debug "Finished running after-all-load scripts for all prepared presets."
 
   # Step 4: Mark all successfully loaded presets as loaded
-  for preset_name in ${SZCDF_PRESET__PREPARED_PRESETS[@]}; do
+  for preset_name in "${SZCDF_PRESET__PREPARED_PRESETS[@]}"; do
     if [[ ! ${SZCDF_PRESET__HAD_FAILURE[$preset_name]+_} ]]; then
-      szcdf_preset__mark_loaded $preset_name
+      szcdf_preset__mark_loaded "$preset_name"
     fi
   done
 
   szcdf_logging__debug "Finished running all loaded presets."
 }
 
-# PRIVATE: Runs the before-any-load scripts for the specified preset
-# $# = 1
-# $1 = the name of the preset that is about to be loaded
-szcdf_preset__run_on_before_any_load() {
-  # Check if arg exists
-  if [[ -z "$1" ]]; then
-    szcdf_logging__warning "No preset specified. Skipping."
-    return
-  fi
-  local preset_name=$1
-  shift
-  # Check if preset is already loaded
-  if [[ ${SZCDF_PRESET__IS_LOADED[$preset_name]+_} ]]; then
-    szcdf_logging__debug "Preset '$preset_name' is already loaded. Skipping run before-any-load scripts."
-    return
-  fi
-  # Check if preset dir exists and set it
-  local preset_dir="$SZCDF_G__ROOT_DIR/preset.d/$preset_name" 
-  if [[ ! -d  "$preset_dir" ]]; then
-    szcdf_logging__warning "Preset '$preset_name' must have a dir at \"$preset_dir\". Skipping run before-any-load scripts."
-    return 1
-  fi
-  # Check if 1*-on_before_any_load exists and run it
-  szcdf_logging__debug "Running before-any-load scripts for preset '$preset_name'..."
-  szcdf_preset__source_preset_script '1-on_pre_any_load.sh'
-  if [[ $? -ne 0 ]]; then
-    SZCDF_PRESET__HAD_FAILURE[$preset_name]=1
-    szcdf_logging__warning "Encountered failure when running before-any-load script for preset '$preset_name'. Skipping this preset."
-    return 1
-  fi
-  szcdf_logging__debug "Finished running before-any-load scripts for preset '$preset_name'."
-}
+# # PRIVATE: Runs the before-any-load scripts for the specified preset
+# # $# = 1
+# # $1 = the name of the preset that is about to be loaded
+# szcdf_preset__run_on_before_any_load() {
+#   # Check if arg exists
+#   if [[ -z "$1" ]]; then
+#     szcdf_logging__warning "No preset specified. Skipping."
+#     return
+#   fi
+#   local preset_name=$1
+#   shift
+#   # Check if preset is already loaded
+#   if [[ ${SZCDF_PRESET__IS_LOADED[$preset_name]+_} ]]; then
+#     szcdf_logging__debug "Preset '$preset_name' is already loaded. Skipping run before-any-load scripts."
+#     return
+#   fi
+#   # Check if preset dir exists and set it
+#   local preset_dir="$SZCDF_G__ROOT_DIR/preset.d/$preset_name" 
+#   if [[ ! -d  "$preset_dir" ]]; then
+#     szcdf_logging__warning "Preset '$preset_name' must have a dir at \"$preset_dir\". Skipping run before-any-load scripts."
+#     return 1
+#   fi
+#   # Check if 1*-on_before_any_load exists and run it
+#   szcdf_logging__debug "Running before-any-load scripts for preset '$preset_name'..."
+#   szcdf_preset__source_preset_script '1-on_pre_any_load.sh'
+#   if [[ $? -ne 0 ]]; then
+#     SZCDF_PRESET__HAD_FAILURE[$preset_name]=1
+#     szcdf_logging__warning "Encountered failure when running before-any-load script for preset '$preset_name'. Skipping this preset."
+#     return 1
+#   fi
+#   szcdf_logging__debug "Finished running before-any-load scripts for preset '$preset_name'."
+# }
 
-# PRIVATE: Runs the on-load scripts for the specified preset
-# $# = 1
-# $1 = the name of the preset to load
-szcdf_preset__run_on_load() {
-  # Check if arg exists
-  if [[ -z "$1" ]]; then
-    szcdf_logging__warning "No preset specified. Skipping."
-    return
-  fi
-  local preset_name=$1
-  shift
-  # Check if preset is already loaded
-  if [[ ${SZCDF_PRESET__IS_LOADED[$preset_name]+_} ]]; then
-    szcdf_logging__debug "Preset '$preset_name' is already loaded. Skipping run on-load scripts."
-    return
-  fi
-  # Check to make sure the preset hasn't hit had any failures
-  if [[ ${SZCDF_PRESET__HAD_FAILURE[$preset_name]+_} ]]; then
-    return 1
-  fi
-  # Check if preset dir exists and set it
-  local preset_dir="$SZCDF_G__ROOT_DIR/preset.d/$preset_name" 
-  if [[ ! -d  "$preset_dir" ]]; then
-    szcdf_logging__warning "Preset '$preset_name' must have a dir at \"$preset_dir\". Skipping run on-load scripts."
-    return 1
-  fi
-  # Check if 2*-on_load exists and run it
-  szcdf_logging__debug "Running on-load scripts for preset '$preset_name'..."
-  szcdf_preset__source_preset_script '2-on_load.sh'
-  if [[ $? -ne 0 ]]; then
-    SZCDF_PRESET__HAD_FAILURE[$preset_name]=1
-    szcdf_logging__warning "Encountered failure when running before-any-load script for preset '$preset_name'. Skipping this preset."
-    return 1
-  fi
-  szcdf_logging__debug "Finished running on-load scripts for preset '$preset_name'."
-}
+# # PRIVATE: Runs the on-load scripts for the specified preset
+# # $# = 1
+# # $1 = the name of the preset to load
+# szcdf_preset__run_on_load() {
+#   # Check if arg exists
+#   if [[ -z "$1" ]]; then
+#     szcdf_logging__warning "No preset specified. Skipping."
+#     return
+#   fi
+#   local preset_name=$1
+#   shift
+#   # Check if preset is already loaded
+#   if [[ ${SZCDF_PRESET__IS_LOADED[$preset_name]+_} ]]; then
+#     szcdf_logging__debug "Preset '$preset_name' is already loaded. Skipping run on-load scripts."
+#     return
+#   fi
+#   # Check to make sure the preset hasn't hit had any failures
+#   if [[ ${SZCDF_PRESET__HAD_FAILURE[$preset_name]+_} ]]; then
+#     return 1
+#   fi
+#   # Check if preset dir exists and set it
+#   local preset_dir="$SZCDF_G__ROOT_DIR/preset.d/$preset_name" 
+#   if [[ ! -d  "$preset_dir" ]]; then
+#     szcdf_logging__warning "Preset '$preset_name' must have a dir at \"$preset_dir\". Skipping run on-load scripts."
+#     return 1
+#   fi
+#   # Check if 2*-on_load exists and run it
+#   szcdf_logging__debug "Running on-load scripts for preset '$preset_name'..."
+#   szcdf_preset__source_preset_script '2-on_load.sh'
+#   if [[ $? -ne 0 ]]; then
+#     SZCDF_PRESET__HAD_FAILURE[$preset_name]=1
+#     szcdf_logging__warning "Encountered failure when running before-any-load script for preset '$preset_name'. Skipping this preset."
+#     return 1
+#   fi
+#   szcdf_logging__debug "Finished running on-load scripts for preset '$preset_name'."
+# }
 
-# PRIVATE: Runs the after-all-load scripts the specified preset
-# $# = 1
-# $1 = the name of the preset that was loaded
-szcdf_preset__run_on_after_all_load() {
-  # Check if arg exists
-  if [[ -z "$1" ]]; then
-    szcdf_logging__warning "No preset specified. Skipping."
-    return
-  fi
-  local preset_name=$1
-  shift
-  # Check to make sure the preset has not been fully loaded yet
-  if [[ ${SZCDF_PRESET__IS_LOADED[$preset_name]+_} ]]; then
-    szcdf_logging__debug "Preset '$preset_name' is loaded. Skipping run after-all-load scripts."
-    return
-  fi
-  # Check to make sure the preset hasn't hit had any failures
-  if [[ ${SZCDF_PRESET__HAD_FAILURE[$preset_name]+_} ]]; then
-    return 1
-  fi
-  # Check if preset dir exists and set it
-  local preset_dir="$SZCDF_G__ROOT_DIR/preset.d/$preset_name" 
-  if [[ ! -d  "$preset_dir" ]]; then
-    szcdf_logging__warning "Preset '$preset_name' must have a dir at \"$preset_dir\". Skipping run after-all-load scripts."
-    return 1
-  fi
-  # Check if 3*-on_after_all_load exists and run it
-  szcdf_logging__debug "Running after-all-load scripts for preset '$preset_name'..."
-  for script in "$preset_dir/3*.sh"; do
-    source script
-    if [[ $? -ne 0 ]]; then
-      SZCDF_PRESET__HAD_FAILURE[$preset_name]=1
-      szcdf_logging__warning "Encountered failure when running before-any-load script for preset '$preset_name'. Skipping this preset."
-      return 1
-    fi
-  done
-  szcdf_logging__debug "Finished running after-all-load scripts for preset '$preset_name'."
-}
+# # PRIVATE: Runs the after-all-load scripts the specified preset
+# # $# = 1
+# # $1 = the name of the preset that was loaded
+# szcdf_preset__run_on_after_all_load() {
+#   # Check if arg exists
+#   if [[ -z "$1" ]]; then
+#     szcdf_logging__warning "No preset specified. Skipping."
+#     return
+#   fi
+#   local preset_name=$1
+#   shift
+#   # Check to make sure the preset has not been fully loaded yet
+#   if [[ ${SZCDF_PRESET__IS_LOADED[$preset_name]+_} ]]; then
+#     szcdf_logging__debug "Preset '$preset_name' is loaded. Skipping run after-all-load scripts."
+#     return
+#   fi
+#   # Check to make sure the preset hasn't hit had any failures
+#   if [[ ${SZCDF_PRESET__HAD_FAILURE[$preset_name]+_} ]]; then
+#     return 1
+#   fi
+#   # Check if preset dir exists and set it
+#   local preset_dir="$SZCDF_G__ROOT_DIR/preset.d/$preset_name" 
+#   if [[ ! -d  "$preset_dir" ]]; then
+#     szcdf_logging__warning "Preset '$preset_name' must have a dir at \"$preset_dir\". Skipping run after-all-load scripts."
+#     return 1
+#   fi
+#   # Check if 3*-on_after_all_load exists and run it
+#   szcdf_logging__debug "Running after-all-load scripts for preset '$preset_name'..."
+#   for script in "$preset_dir/3*.sh"; do
+#     source script
+#     if [[ $? -ne 0 ]]; then
+#       SZCDF_PRESET__HAD_FAILURE[$preset_name]=1
+#       szcdf_logging__warning "Encountered failure when running before-any-load script for preset '$preset_name'. Skipping this preset."
+#       return 1
+#     fi
+#   done
+#   szcdf_logging__debug "Finished running after-all-load scripts for preset '$preset_name'."
+# }
 
 # PRIVATE: Runs the scripts for a given preset and stage
 # $# = 2
@@ -364,9 +372,8 @@ szcdf_preset__run_load_stage() {
   fi
   # For each script in the stage, run it
   szcdf_logging__debug "Running $load_stage_name (load stage $load_stage_num) scripts for preset '$preset_name'..."
-  for script in "$preset_dir/${load_stage_num}*.sh"; do
-    source script
-    if [[ $? -ne 0 ]]; then
+  for script in "$preset_dir"/"${load_stage_num}"*.sh; do
+    if ! source "$script"; then
       SZCDF_PRESET__HAD_FAILURE[$preset_name]=1
       szcdf_logging__warning "Encountered failure when running $load_stage_name (load stage $load_stage_num) script for preset '$preset_name'. Skipping this preset."
       return 1
@@ -381,8 +388,29 @@ szcdf_preset__run_load_stage() {
 szcdf_preset__mark_loaded() {
   local preset_name=$1
   shift
-  SZCDF_PRESET__LOADED_PRESETS=( ${SZCDF_PRESETS_LOADED[@]} $preset_name )
+  SZCDF_PRESET__LOADED_PRESETS=( "${SZCDF_PRESETS_LOADED[@]}" "$preset_name" )
   SZCDF_PRESET__IS_LOADED[$preset_name]=1
+}
+
+# $# = 1
+# $1 = Name of module to check
+# Stdout: 1 if a module is loaded
+# Return: 0 if loaded, 1 otherwise
+szcdf_preset__is_loaded() {
+  # Check if arg exists
+  if [[ -z "$1" ]]; then
+    szcdf_logging__warning "No preset specified. Skipping."
+    return
+  fi
+  local preset_name=$1
+  shift
+
+  if [[ "${SZCDF_PRESET__LOADED_PRESETS[$preset_name]+_}" ]]; then
+    echo 1
+    return 0
+  else
+    return 1
+  fi
 }
 
 
@@ -390,7 +418,7 @@ szcdf_preset__mark_loaded() {
 
 # Displays usage
 szcdf_preset__usage() {
-  echo >&2 "Usage: szcdf_preset { init | register | prepare-all-registered | load-all-prepared } [args...]"
+  echo >&2 "Usage: szcdf_preset { register | prepare_all_registered | load_all_prepared | is_loaded } [args...]"
 }
 
 
@@ -426,10 +454,12 @@ szcdf_preset__cleanup() {
 
   unset -f szcdf_preset__load_all_prepared
   unset -f szcdf_preset__run_load_stage
-  unset -f szcdf_preset__run_on_before_any_load
-  unset -f szcdf_preset__run_on_load
-  unset -f szcdf_preset__run_on_after_all_load
+  # unset -f szcdf_preset__run_on_before_any_load
+  # unset -f szcdf_preset__run_on_load
+  # unset -f szcdf_preset__run_on_after_all_load
   unset -f szcdf_preset__mark_loaded
+  
+  unset -f szcdf_preset__is_loaded
 
   unset -f szcdf_preset__usage
 

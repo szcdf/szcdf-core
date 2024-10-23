@@ -22,9 +22,9 @@ szcdf_bootstrap__try_load_module() {
     echo >&2 "Module $module does not exist at '$script'! Cannot bootstrap SZCDF. Aborting..."
     return 1
   fi
-  source $script
+  source "$script"
   SZCDF_MODULE__IS_SOURCED[$module]=1
-  szcdf_${module}__init
+  szcdf_"$module"__init
   SZCDF_MODULE__IS_INITED[$module]=1
   SZCDF_MODULE__IS_LOADED[$module]=1
   return 0
@@ -36,12 +36,13 @@ szcdf_bootstrap__try_load_module logging "$SZCDF_G__ROOT_DIR/logging.sh" || retu
 # 2. Use the bootstrap loader to load the module manager module
 szcdf_bootstrap__try_load_module module_manager "$SZCDF_G__ROOT_DIR/module_manager.sh" || return $?
 
-# 3. Load the entry module and "exec" it
+# 3. Load the entry module
 szcdf_module_manager load configureenv || return $?
 
 # 4. Cleanup before "exec"-ing
 unset -f szcdf_bootstrap__try_load_module
 
+# 5. "exec" the entry module
 szcdf_configureenv
 
 return $?

@@ -4,6 +4,8 @@
 # szcdf-core-logging.sh
 # Stephen Zhao
 
+# To load this module, run
+# szcdf_module_manager load logging
 
 ######### INIT ################################################################
 
@@ -25,7 +27,7 @@ szcdf_logging__init() {
 # $1 = The name of the new context
 szcdf_logging__begin_context() {
   export SZCDF_LOGGING__CURRENT_CONTEXT=$1
-  SZCDF_LOGGING__CONTEXT_STACK=( $1 "${SZCDF_LOGGING__CONTEXT_STACK[@]}" )
+  SZCDF_LOGGING__CONTEXT_STACK=( "$1" "${SZCDF_LOGGING__CONTEXT_STACK[@]}" )
 }
 export -f szcdf_logging__begin_context
 
@@ -42,6 +44,7 @@ export -f szcdf_logging__end_context
 
 szcdf_logging__set_level() {
   #TODO: allow setting level
+  return 0
 }
 
 
@@ -52,7 +55,7 @@ szcdf_logging__set_level() {
 # $@ = The messages to print.
 szcdf_logging__debug() {
   if [[ -n "$SZCDF_G__DEBUG_MODE" && "$SZCDF_G__DEBUG_MODE" == 1 ]]; then
-    echo >&2 "[SZCDF][$(date -Iseconds)][DBUG][$SZCDF_LOGGING__CURRENT_CONTEXT] $@"
+    echo >&2 "[SZCDF][$(date -Iseconds)][DBUG][$SZCDF_LOGGING__CURRENT_CONTEXT] $*"
   fi
 }
 export -f szcdf_logging__debug
@@ -61,7 +64,7 @@ export -f szcdf_logging__debug
 # $# = >=0
 # $@ = The messages to print.
 szcdf_logging__info() {
-  echo >&2 "[SZCDF][$(date -Iseconds)][INFO][$SZCDF_LOGGING__CURRENT_CONTEXT] $@"
+  echo >&2 "[SZCDF][$(date -Iseconds)][INFO][$SZCDF_LOGGING__CURRENT_CONTEXT] $*"
 }
 export -f szcdf_logging__info
 
@@ -69,7 +72,7 @@ export -f szcdf_logging__info
 # $# = >=0
 # $@ = The messages to print.
 szcdf_logging__warning() {
-  echo >&2 "$(tput setaf 3)[SZCDF][$(date -Iseconds)][WARN][$SZCDF_LOGGING__CURRENT_CONTEXT] $@$(tput sgr0)"
+  echo >&2 "$(tput setaf 3)[SZCDF][$(date -Iseconds)][WARN][$SZCDF_LOGGING__CURRENT_CONTEXT] $*$(tput sgr0)"
 }
 export -f szcdf_logging__warning
 
@@ -77,7 +80,7 @@ export -f szcdf_logging__warning
 # $# = >=0
 # $@ = The messages to print.
 szcdf_logging__error() {
-  echo >&2 "$(tput setaf 1)[SZCDF][$(date -Iseconds)][ERRO][$SZCDF_LOGGING__CURRENT_CONTEXT] $@$(tput sgr0)"
+  echo >&2 "$(tput setaf 1)[SZCDF][$(date -Iseconds)][ERRO][$SZCDF_LOGGING__CURRENT_CONTEXT] $*$(tput sgr0)"
 }
 export -f szcdf_logging__error
 

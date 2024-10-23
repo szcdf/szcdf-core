@@ -374,7 +374,9 @@ szcdf_preset__run_load_stage() {
   # For each script in the stage, run it
   szcdf_logging__debug "Running $load_stage_name (load stage $load_stage_num) scripts for preset '$preset_name'..."
   for script in "$preset_dir"/"${load_stage_num}"*.sh; do
-    if ! source "$script"; then
+    if [[ ! -f "$script" ]]; then
+      continue
+    elif ! source "$script"; then
       SZCDF_PRESET__HAD_FAILURE[$preset_name]=1
       szcdf_logging__warning "Encountered failure when running $load_stage_name (load stage $load_stage_num) script for preset '$preset_name'. Skipping this preset."
       return 1

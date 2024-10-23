@@ -17,6 +17,7 @@ if [[ -z "$SZCDF_G__ENTRY_POINT" ]]; then
   if [[ -n "$SZCDF_G__ROOT_DIR" ]] && [[ -f "$SZCDF_G__ROOT_DIR/_bootstrap.sh" ]]; then
     # Set up global variables before entering the bootstrap
     if [[ -f "/tmp/SZCDF_G__DEBUG_MODE" ]]; then
+      echo "szcdf: Enabling DEBUG MODE"
       export SZCDF_G__DEBUG_MODE=1
     fi
     export SZCDF_G__ENTRY_POINT="${BASH_SOURCE[0]}"

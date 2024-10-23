@@ -9,6 +9,7 @@ szcdf_configureenv() {
   szcdf_logging__debug "Running szcdf_configureenv..."
   
   szcdf_logging__debug "Loading required modules..."
+  szcdf_module_manager load shinter
   szcdf_module_manager load profile
   szcdf_module_manager load preset
   szcdf_logging__debug "Finished sourcing required modules."

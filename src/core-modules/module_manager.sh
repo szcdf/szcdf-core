@@ -2,7 +2,7 @@
 ###############################################################################
 #
 # szcdf_module
-# module.sh
+# module_manager.sh
 # Stephen Zhao
 
 # This is a module that manages the use of modules.
@@ -112,7 +112,7 @@ szcdf_module_manager__load() {
   fi
   
   # If no optional path parameter or path was bad, use default location
-  if [[ -n "$script" ]]; then
+  if [[ -z "$script" ]]; then
     path="$SZCDF_G__ROOT_DIR/$module.sh"
     szcdf_logging__debug "Checking if module $module exists..."
     if [[ ! -f "$path" ]]; then
@@ -132,7 +132,7 @@ szcdf_module_manager__load() {
   if [[ ${SZCDF_MODULE__IS_SOURCED[$module]+_} ]] || [[ ${SZCDF_MODULE__IS_SOURCING[$module]+_} ]]; then
     szcdf_logging__debug "Module $module is already sourced. Skipping source..."
   else
-    szcdf_logging__debug "Module $module is not yet sourced, so sourcing now..."
+    szcdf_logging__debug "Module $module is not yet sourced, so sourcing now (from $script)..."
     SZCDF_MODULE__IS_SOURCING[$module]=1
     source "$script"
     SZCDF_MODULE__IS_SOURCED[$module]=1

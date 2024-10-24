@@ -75,6 +75,11 @@ fi # szcdf_shinter get_is_interactive
 
 # Below are things to do regardless of interactivity
 
+if [[ -z "$LANG" ]]; then
+  szcdf_logging__warning "No LANG set. Defaulting to 'en_US.UTF-8'..."
+  export LANG=en_US.UTF-8
+fi
+
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
@@ -83,9 +88,12 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 export EDITOR=vim
 
 # Source the shell aliases
-if [[ -f "$HOME/.aliases" ]] && [[ -z "$SZCDF_ISSOURCED_MODULE_aliases" ]]; then
-  SZCDF_ISSOURCED_MODULE_aliases=1
+if [[ -f "$HOME/.aliases" ]]; then
   source "$HOME/.aliases"
+fi
+
+if [[ -f "$HOME/.bash_aliases" ]]; then
+  source "$HOME/.bash_aliases"
 fi
 
 szcdf_logging__debug "Finished running recommended .bashrc run-commands."

@@ -10,18 +10,25 @@ COPY src/core-startup/_bootstrap.sh $CONFIG_ROOT/_bootstrap.sh
 COPY src/core-startup/configureenv.sh $CONFIG_ROOT/configureenv.sh
 
 # === SZCDF core modules ===
+COPY src/core-modules/colors.sh $CONFIG_ROOT/colors.sh
 COPY src/core-modules/logging.sh $CONFIG_ROOT/logging.sh
 COPY src/core-modules/module_manager.sh $CONFIG_ROOT/module_manager.sh
-COPY src/core-modules/profile.sh $CONFIG_ROOT/profile.sh
+COPY src/core-modules/powerline.sh $CONFIG_ROOT/powerline.sh
 COPY src/core-modules/preset.sh $CONFIG_ROOT/preset.sh
+COPY src/core-modules/profile.sh $CONFIG_ROOT/profile.sh
 COPY src/core-modules/shinter.sh $CONFIG_ROOT/shinter.sh
 
 # === SZCDF core profiles ===
 COPY src/core-profiles/default $CONFIG_ROOT/profile.d/default
+COPY src/core-profiles/Nordlander__WSL $CONFIG_ROOT/profile.d/Nordlander__WSL
 
 # === SZCDF core presets ===
 COPY src/core-presets/bash-recommended $CONFIG_ROOT/preset.d/bash-recommended
+COPY src/core-presets/prompt-powerline-blue $CONFIG_ROOT/preset.d/prompt-powerline-blue
+COPY src/core-presets/prompt-powerline-gold $CONFIG_ROOT/preset.d/prompt-powerline-gold
+COPY src/core-presets/prompt-powerline-purple $CONFIG_ROOT/preset.d/prompt-powerline-purple
 COPY src/core-presets/prompt-standard $CONFIG_ROOT/preset.d/prompt-standard
+COPY src/core-presets/zhaonetwork1-accessor $CONFIG_ROOT/preset.d/zhaonetwork1-accessor
 
 # === SZCDF entries ===
 # Add entrypoint calls to all appropriate bash run-command scripts
@@ -29,3 +36,58 @@ PREPENDTEXT src/core-entries/entry-bash.sh .profile ENTRY-BASH
 PREPENDTEXT src/core-entries/entry-bash.sh .bash_profile ENTRY-BASH
 PREPENDTEXT src/core-entries/entry-bash.sh .bashrc ENTRY-BASH
 
+#;;
+#;; Shell files
+#;;
+#softln    shell/.profile        .profile
+#softln    shell/.aliases        .aliases
+#softln    shell/.aliases_uw     .aliases_uw
+#softln    shell/.aliases_epfl   .aliases_epfl
+#
+#;;
+#;; Bash config files
+#;;
+#softln    shell/.aliases        .bash_aliases
+#softln    bash/.bash_profile    .bash_profile
+#softln    bash/.bashrc          .bashrc
+#softln    bash/.dircolors       .dircolors
+#
+#;;
+#;; Git config files
+#;;
+#softln    git/.gitconfig        .gitconfig
+#
+#;;
+#;; X11 config files
+#;;
+#softln    X11/.Xresources       .Xresources
+#softln    X11/.xinitrc          .xinitrc
+#softln    X11/.xsessionrc       .xsessionrc
+#
+#;;
+#;; vim config files
+#;;
+#softln    szc_vim.d/profile.d   .config/szc_vim.d/profile.d
+#softln    szc_vim.d/vimrc       .config/szc_vim.d/vimrc
+#
+#;;
+#;; i3 config files
+#;;
+#softln    i3/config             .config/i3/config.d/1-basics
+#softln    i3/config-pre11       .config/i3/config.d/1-basics.pre11
+#softln    i3/config-gaps        .config/i3/config.d/2-gaps
+#
+#;;
+#;; compton files
+#;;
+#softln    compton/compton.conf  .config/compton.conf
+#
+#;;
+#;; feh background files
+#;;
+#softln    feh/.fehbg            .fehbg
+#
+#;;
+#;; polybar files
+#;;
+#softln    polybar/config        .config/polybar/config

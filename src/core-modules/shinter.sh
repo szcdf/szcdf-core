@@ -40,11 +40,11 @@ szcdf_shinter() {
 ######### SUBCOMMANDS #########################################################
 
 # $# = 0
-# stdout = whether the shell is interactive or not (1 or empty)
+# stdout = whether the shell is interactive or not (Y or empty)
 szcdf_shinter__detect_is_interactive() {
   # Check interactivity
   if [[ $- == *i* ]]; then
-    echo 1
+    echo Y
     return 0
   else
     return 1
@@ -58,13 +58,14 @@ szcdf_shinter__detect_and_set_is_interactive() {
 }
 
 # $# = 0
-# stdout = whether the shell is interactive or not (1 or empty)
+# stdout = whether the shell is interactive or not (Y or empty)
+# $? = 0 if interactive, 1 if not
 szcdf_shinter__get_is_interactive() {
   if [[ -z "$szcdf_shinter__IS_INTERACTIVE" ]]; then
     szcdf_shinter__detect_and_set_is_interactive
   fi
-  if [[ -n "${szcdf_shinter__IS_INTERACTIVE}" ]]; then
-    echo 1
+  if [[ -n "$szcdf_shinter__IS_INTERACTIVE" ]]; then
+    echo Y
     return 0
   else
     return 1

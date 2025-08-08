@@ -1,5 +1,6 @@
 services:
   szcdf-installer-test:
+    hostname: szcdf-tester
     build:
       context: installer
       args:

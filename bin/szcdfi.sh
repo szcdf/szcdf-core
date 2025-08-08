@@ -676,61 +676,6 @@ szcdf_install__execute_appendtext() {
   # TODO
 }
 
-  #   softln)
-  #     # Check if file already exists
-  #     if [[ -e "$HOME/$link" ]]; then
-  #       old_target="$(readlink -f "$HOME/$link")"
-  #       # Check old target is the same as new target
-  #       if [[ "$old_target" == "$ROOT_DIR/$target" ]]; then
-  #         # If they are equal, skip
-  #         szcdf_install__display_output "Softlink '$HOME/$link' exists"
-  #         szcdf_install__display_output_append "and correctly points to '$ROOT_DIR/$target'."
-  #         szcdf_install__display_output_append "Skipping"
-  #         return
-  #       fi
-  #       # Check with the user if he/she wants to replace it
-  #       local prompt_text=$(echo -en \
-  #         $(szcdf_install__display_output "The installer wants to replace the file $HOME/$link:")"\n"\
-  #         $(szcdf_install__display_output_append "Old target: $(tput setaf 1)$old_target$(tput sgr0)")"\n"\
-  #         $(szcdf_install__display_output_append "New target: $(tput setaf 2)$ROOT_DIR/$target$(tput sgr0)")"\n"\
-  #         $(szcdf_install__display_output_append "Replace?")\
-  #       )
-  #       if ! szcdf_install__prompt_confirmation_is_yes "$prompt_text"; then
-  #         szcdf_install__display_warning "$HOME/$link will not be created."
-  #         return
-  #       fi
-  #       # Remove the old link
-  #       rm "$HOME/$link"
-  #     fi
-  #     # Check to see if folder exists, otherwise make a folder
-  #     if [[ ! -e "$(dirname "$HOME/$link")" ]]; then
-  #       mkdir -p "$(dirname "$HOME/$link")"
-  #     fi
-  #     # Create the link
-  #     ln -vs "$ROOT_DIR/$target" "$HOME/$link"
-  #     ;;
-  #   gitclone)
-  #     git_repo="$(echo "$line" | awk '{print $2;}')"
-  #     clone_target="$(echo "$line" | awk '{print $3;}')"
-  #     git clone $git_repo $ROOT_DIR/$clone_target
-  #     ;;
-  #   vimcmd)
-  #     vim_cmds="$(echo "$line" | awk '{$1=""; print $0;}' | sed -E 's/([^[:space:]]+)/+\1/g')"
-  #     echo "Starting vim..."
-  #     vim $vim_cmds - < /dev/null
-  #     echo "Exited vim."
-  #     ;;
-  #   \;*)
-  #     ;;
-  #   "")
-  #     ;;
-  #   \r)
-  #     ;;
-  #   *)
-  #     szcdf_install__display_warning "Unknown directive \"$line\""
-  #     ;;
-  # esac
-
 
 ######### DISPLAY #############################################################
 

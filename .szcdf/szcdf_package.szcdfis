@@ -12,6 +12,7 @@ COPY src/core-modules/colors.sh $CONFIG_ROOT/colors.sh
 COPY src/core-modules/logging.sh $CONFIG_ROOT/logging.sh
 COPY src/core-modules/module_manager.sh $CONFIG_ROOT/module_manager.sh
 COPY src/core-modules/powerline.sh $CONFIG_ROOT/powerline.sh
+COPY src/core-modules/bin_manager.sh $CONFIG_ROOT/bin_manager.sh
 COPY src/core-modules/preset.sh $CONFIG_ROOT/preset.sh
 COPY src/core-modules/profile.sh $CONFIG_ROOT/profile.sh
 COPY src/core-modules/shinter.sh $CONFIG_ROOT/shinter.sh

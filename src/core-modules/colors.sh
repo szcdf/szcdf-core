@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
 ###############################################################################
 #
-# szcdf_module
-# colors.sh
-# Stephen Zhao
-
-# This is a module that supplies colors data.
-
+# Package: szcdf-core
+# Author: Stephen Zhao (mail@zhaostephen.com)
+# Script Type: Module
+# Module: colors
+# Purpose: Supplies colors data.
+#
 # To load this module, run
+# ```bash
 # szcdf_module_manager load colors
+# ```
 
 ######### MAIN ################################################################
 

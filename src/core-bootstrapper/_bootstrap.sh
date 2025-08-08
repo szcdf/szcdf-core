@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
 ###############################################################################
 #
-# szcdf-core-_bootstrap.sh
-# Stephen Zhao
-
+# Package: szcdf-core
+# Author: Stephen Zhao (mail@zhaostephen.com)
+# Script Type: Bootstrapper
+# Purpose: Bootstraps the SZCDF system.
+#
+# This script should generally be sourced from an Entry script.
+#
 # This script bootstraps the core SZCDF system by
 # 1. manually sourcing and initializing the logging module,
 # 2. manually sourcing and initializing the module_manager module,
-# 3. load the entry module and enter it.
+# 3. loading the startup module and entering it.
 
 declare -A SZCDF_MODULE__IS_SOURCED
 declare -A SZCDF_MODULE__IS_INITED
@@ -36,13 +40,13 @@ szcdf_bootstrap__try_load_module logging "$SZCDF_G__ROOT_DIR/logging.sh" || retu
 # 2. Use the bootstrap loader to load the module manager module
 szcdf_bootstrap__try_load_module module_manager "$SZCDF_G__ROOT_DIR/module_manager.sh" || return $?
 
-# 3. Load the entry module
-szcdf_module_manager load configureenv || return $?
+# 3. Load the startup module
+szcdf_module_manager load startup || return $?
 
 # 4. Cleanup before "exec"-ing
 unset -f szcdf_bootstrap__try_load_module
 
-# 5. "exec" the entry module
-szcdf_configureenv
+# 5. "exec" the startup module
+szcdf_startup
 
 return $?

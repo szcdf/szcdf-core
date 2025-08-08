@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
 ###############################################################################
 #
-# szcdf_module
-# powerline.sh
-# Stephen Zhao
-
-# This is a module that helps with powerline customization.
-
+# Package: szcdf-core
+# Author: Stephen Zhao (mail@zhaostephen.com)
+# Script Type: Module
+# Module: powerline
+# Purpose: Helps with powerline customization.
+#
 # To load this module, run
+# ```bash
 # szcdf_module_manager load powerline
+# ```
 
 ######### MAIN ################################################################
 

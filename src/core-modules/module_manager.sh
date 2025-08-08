@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 ###############################################################################
 #
-# szcdf_module
-# module_manager.sh
-# Stephen Zhao
-
-# This is a module that manages the use of modules.
-
+# Package: szcdf-core
+# Author: Stephen Zhao (mail@zhaostephen.com)
+# Script Type: Module
+# Module: module_manager
+# Purpose: Manages the use of modules.
+#
+# To load this module, since it is what is normally responsible for
+# loading modules, you must load it manually, or use a bootstrapper.
 
 ######### MAIN ################################################################
 

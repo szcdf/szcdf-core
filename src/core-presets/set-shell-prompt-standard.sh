@@ -1,17 +1,17 @@
 #!/bin/bash
 ###############################################################################
 #
-# szcdf_preset
-# prompt-standard/2-on_load.sh
-# Stephen Zhao
+# Package: szcdf-core
+# Author: Stephen Zhao (mail@zhaostephen.com)
+# Script Type: Preset
+# Preset: set-shell-prompt-standard
+# Purpose: Sets up the standard shell prompt.
 
-# The core script to run when the preset is run
-
-szcdf_logging__begin_context 'preset-prompt-standard/on_load'
+szcdf_logging__begin_context 'core-presets/set-shell-prompt-standard'
 
 if ! szcdf_shinter get_is_interactive; then
 
-  szcdf_logging__info "Shell is not interactive. The on_load of preset-prompt-standard only applies when the shell is interative. Skipping..."
+  szcdf_logging__info "Shell is not interactive. The set-shell-prompt-standard only applies when the shell is interative. Skipping..."
 
   szcdf_logging__debug "Finished setting up PS1."
 

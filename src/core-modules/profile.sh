@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 ###############################################################################
 #
-# szcdf_module
-# profile.sh
-# Stephen Zhao
-
-# This module can be used to define and handle profiles.
-# A profile is a autodetected environment and a list of presets to apply
-# for that environment.
-
+# Package: szcdf-core
+# Author: Stephen Zhao (mail@zhaostephen.com)
+# Script Type: Module
+# Module: profile
+# Purpose: Can be used to define and handle profiles.
+#
 # To load this module, run
+# ```bash
 # szcdf_module_manager load profile
+# ```
 
 ######### MAIN ################################################################
 

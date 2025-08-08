@@ -1,15 +1,15 @@
 #!/bin/bash
 ###############################################################################
 #
-# szcdf_preset
-# bash-recommended/2-on_run.sh
-# Stephen Zhao
+# Package: szcdf-core
+# Author: Stephen Zhao (mail@zhaostephen.com)
+# Script Type: Preset
+# Preset: add-bash-recommended
+# Purpose: Generally recommended settings for bash.
 
-# The core script to run when the preset is run
+szcdf_logging__begin_context 'core-presets/add-bash-recommended'
 
-szcdf_logging__begin_context 'preset-bash-recommended/on_run'
-
-szcdf_logging__debug "Running on_run..."
+szcdf_logging__debug "Running add-bash-recommended..."
 
 if szcdf_shinter get_is_interactive; then
 
@@ -96,6 +96,6 @@ if [[ -f "$HOME/.bash_aliases" ]]; then
   source "$HOME/.bash_aliases"
 fi
 
-szcdf_logging__debug "Finished running recommended .bashrc run-commands."
+szcdf_logging__debug "Finished running add-bash-recommended."
 
 szcdf_logging__end_context

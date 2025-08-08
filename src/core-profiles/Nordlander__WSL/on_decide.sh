@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 ###############################################################################
 #
-# szcdf_profile
-# Nordlander__WSL/on_decide.sh
-# Stephen Zhao
+# Package: szcdf-core
+# Profile: Nordlander__WSL
+# Author: Stephen Zhao (mail@zhaostephen.com)
+# Script Type: Profile
+# Purpose: Decides if the Nordlander__WSL profile should be used.
 
 if [[ "$(hostname)" == "Nordlander" && -n $(uname -a | grep -i "Microsoft") ]]; then
-  # echo 'Nordlander__WSL'
-  return
+  echo 'Nordlander__WSL'
 fi

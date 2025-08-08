@@ -1,8 +1,13 @@
 #!/bin/bash
 ###############################################################################
 #
-# szcdf-entry-bash.sh
-# Stephen Zhao
+# Package: szcdf-core
+# Author: Stephen Zhao (mail@zhaostephen.com)
+# Script Type: Entry
+# Entry Target: bash
+# Purpose: The entry point for the SZCDF system when bash is the shell.
+#
+# This script sources the bootstrapper.
 
 # Only run this if we have not hit an entry point yet
 if [[ -z "$SZCDF_G__ENTRY_POINT" ]]; then

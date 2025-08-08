@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
 ###############################################################################
 #
-# szcdf_module
-# shinter.sh
-# Stephen Zhao
-
-# This is a module that determines with interactivity of the shell.
-
+# Package: szcdf-core
+# Author: Stephen Zhao (mail@zhaostephen.com)
+# Script Type: Module
+# Module: shinter
+# Purpose: Determines the interactivity of the shell.
+#
 # To load this module, run
+# ```bash
 # szcdf_module_manager load shinter
+# ```
 
 ######### MAIN ################################################################
 

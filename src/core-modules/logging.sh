@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 ###############################################################################
 #
-# szcdf_module
-# logging.sh
-# Stephen Zhao
-
+# Package: szcdf-core
+# Author: Stephen Zhao (mail@zhaostephen.com)
+# Script Type: Module
+# Module: logging
+# Purpose: Provides logging functionality.
+#
 # To load this module, run
+# ```bash
 # szcdf_module_manager load logging
+# ```
 
 ######### INIT ################################################################
 

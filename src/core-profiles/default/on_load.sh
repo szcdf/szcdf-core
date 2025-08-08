@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
 ###############################################################################
 #
-# szcdf_profile
-# default/on_load.sh
-# Stephen Zhao
+# Package: szcdf-core
+# Profile: default
+# Author: Stephen Zhao (mail@zhaostephen.com)
+# Script Type: Profile
+# Purpose: The default profile for szcdf-core.
 
-szcdf_logging__begin_context 'profile-default/on_load'
+szcdf_logging__begin_context 'core-profiles/default'
 
-szcdf_logging__debug "Loading presets for profile 'default'..."
+szcdf_logging__debug "Registering presets for profile 'default'..."
 
-szcdf_preset register bash-recommended
-szcdf_preset register prompt-standard
+szcdf_preset register add-bash-recommended
+szcdf_preset register set-shell-prompt-standard
 
-szcdf_logging__debug "Finished loading presets for profile 'default'."
+szcdf_logging__debug "Finished registering presets for profile 'default'."
 
 szcdf_logging__end_context

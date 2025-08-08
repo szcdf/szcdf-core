@@ -19,6 +19,18 @@ else
   /usr/bin/keychain "$HOME"/.ssh/id_rsa.zhaonetwork1
 fi
 
+if [[ ! -d $HOME/.keychain ]]; then
+  szc_logging__warning "Directory $HOME/.keychain not found. Skipping keychain setup..."
+  return
+fi
+
+if [[ ! -e $HOME/.keychain/$(hostname)-sh ]]; then
+  szc_logging__warning "No keys found in keychain. Skipping keychain setup..."
+  return
+fi
+
+source $HOME/.keychain/$(hostname)-sh
+
 szcdf_logging__debug "Finished running add-zhaonetwork1-accessor."
 
 szcdf_logging__end_context

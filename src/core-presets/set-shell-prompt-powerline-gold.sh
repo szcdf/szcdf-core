@@ -9,6 +9,9 @@
 
 szcdf_logging__begin_context 'core-presets/set-shell-prompt-powerline-gold'
 
+szcdf_module_manager load colors
+szcdf_module_manager load powerline
+
 szcdf_logging__debug "Setting up PS1..."
 
 if ! szcdf_shinter get_is_interactive; then

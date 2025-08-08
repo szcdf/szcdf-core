@@ -5,7 +5,7 @@
 # Author: Stephen Zhao (mail@zhaostephen.com)
 # Script Type: Module
 # Module: bin_manager
-# Purpose: Manages user-invocable scripts under bin.d by importing them
+# Purpose: Manages user-invocable scripts under bin by importing them
 #          into ~/.local/bin so they are available on $PATH.
 #
 # To load this module, run
@@ -77,7 +77,7 @@ szcdf_bin_manager__init() {
 ######### HELPERS ##############################################################
 
 szcdf_bin_manager__get_src_bin_dir() {
-  echo "$SZCDF_G__ROOT_DIR/bin.d"
+  echo "$SZCDF_G__ROOT_DIR/bin"
 }
 
 szcdf_bin_manager__get_dest_bin_dir() {
@@ -87,7 +87,7 @@ szcdf_bin_manager__get_dest_bin_dir() {
 
 ######### SUBCOMMANDS #########################################################
 
-# Lists available scripts found in $SZCDF_G__ROOT_DIR/bin.d
+# Lists available scripts found in $SZCDF_G__ROOT_DIR/bin
 # $# = 0
 szcdf_bin_manager__list() {
   local scripts_dir
@@ -112,7 +112,7 @@ szcdf_bin_manager__list() {
 
 # Imports a single script into ~/.local/bin via symlink
 # $# = 1
-# $1 = script file name inside bin.d (basename)
+# $1 = script file name inside bin (basename)
 szcdf_bin_manager__import() {
   if ! declare -p SZCDF_BIN_MANAGER__IS_IMPORTED >/dev/null 2>&1; then
     declare -A SZCDF_BIN_MANAGER__IS_IMPORTED
@@ -170,7 +170,7 @@ szcdf_bin_manager__import() {
   szcdf_logging__info "Imported script '$script_name' to '$dest_path'."
 }
 
-# Imports all scripts from bin.d
+# Imports all scripts from bin
 # $# = 0
 szcdf_bin_manager__import_all() {
   local scripts_dir
@@ -232,7 +232,7 @@ szcdf_bin_manager__remove() {
   return 1
 }
 
-# Cleans up broken symlinks in ~/.local/bin pointing into bin.d
+# Cleans up broken symlinks in ~/.local/bin pointing into bin
 # $# = 0
 szcdf_bin_manager__clean() {
   local scripts_dir

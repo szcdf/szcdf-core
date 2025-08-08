@@ -87,10 +87,22 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 # Set default editor -- always vim <3
 export EDITOR=vim
 
-# Add some default aliases
-alias ll='ls -alF'
-alias la='ls -A'
+# ls should use colour
 alias ls='ls --color=auto'
+# lv for the most verbose, most info, + hidden files directory listing
+alias lv='ls -AFGlhpi'
+# ll for long, human readable, + hidden files directory listing
+alias ll='ls -AFGlhp'
+# la for short, + hidden files directory listing
+alias la='ls -AFGhp'
+
+# Increase verbosity
+alias mkdir='mkdir -v'
+
+# Colorize grep
+alias grep='grep --color=auto'
+alias egrep='egrep --color=auto'
+alias fgrep='fgrep --color=auto'
 
 # Source the shell aliases
 if [[ -f "$HOME/.aliases" ]]; then

@@ -11,8 +11,6 @@ szcdf_logging__begin_context 'core-profiles/szcdf_tester'
 
 szcdf_logging__debug "Loading required modules..."
 
-szcdf_module_manager load colors
-szcdf_module_manager load powerline
 szcdf_module_manager load bin_manager
 
 szcdf_logging__debug "Finished loading required modules."
@@ -21,6 +19,7 @@ szcdf_logging__debug "Registering presets for profile 'szcdf_tester'..."
 
 szcdf_preset register add-bash-recommended
 szcdf_preset register set-shell-prompt-powerline-blue
+szcdf_preset register use-nord-theme
 
 szcdf_logging__debug "Finished registering presets for profile 'szcdf_tester'."
 

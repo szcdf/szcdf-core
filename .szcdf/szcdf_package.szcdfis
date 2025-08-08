@@ -21,13 +21,15 @@ PREPENDTEXT src/core-entries/entry-bash.sh .profile ENTRY-BASH
 PREPENDTEXT src/core-entries/entry-bash.sh .bash_profile ENTRY-BASH
 PREPENDTEXT src/core-entries/entry-bash.sh .bashrc ENTRY-BASH
 
-# === SZCDF scripts ===
-COPYALL src/core-bin $CONFIG_ROOT/bin.d
+# === SZCDF bins ===
+COPYALL src/core-bin $CONFIG_ROOT/bin
+
+# === SZCDF data ===
+COPYALL src/core-data $CONFIG_ROOT/data.d
 
 #;;
 #;; Shell files
 #;;
-#softln    shell/.profile        .profile
 #softln    shell/.aliases        .aliases
 #softln    shell/.aliases_uw     .aliases_uw
 #softln    shell/.aliases_epfl   .aliases_epfl
@@ -35,9 +37,6 @@ COPYALL src/core-bin $CONFIG_ROOT/bin.d
 #;;
 #;; Bash config files
 #;;
-#softln    shell/.aliases        .bash_aliases
-#softln    bash/.bash_profile    .bash_profile
-#softln    bash/.bashrc          .bashrc
 #softln    bash/.dircolors       .dircolors
 #
 #;;
@@ -55,7 +54,6 @@ COPYALL src/core-bin $CONFIG_ROOT/bin.d
 #;;
 #;; vim config files
 #;;
-#softln    szc_vim.d/profile.d   .config/szc_vim.d/profile.d
 #softln    szc_vim.d/vimrc       .config/szc_vim.d/vimrc
 #
 #;;

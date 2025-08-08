@@ -13,6 +13,7 @@ szcdf_logging__debug "Loading required modules for profile 'Nordlander__WSL'..."
 
 szcdf_module_manager load colors
 szcdf_module_manager load powerline
+szcdf_module_manager load bin_manager
 
 szcdf_logging__debug "Finished loading required modules for profile 'Nordlander__WSL'."
 
@@ -20,10 +21,11 @@ szcdf_logging__debug "Registering presets for profile 'Nordlander__WSL'..."
 
 szcdf_preset register add-bash-recommended
 szcdf_preset register set-shell-prompt-powerline-blue
+szcdf_preset register add-wsl-recommended
+szcdf_preset register zhaonetwork1-accessor
 # szcdf_preset register conda
 # szcdf_preset register nodejs-dev
 # szcdf_preset register szc-module-vim
-szcdf_preset register zhaonetwork1-accessor
 
 szcdf_logging__debug "Finished registering presets for profile 'Nordlander__WSL'."
 

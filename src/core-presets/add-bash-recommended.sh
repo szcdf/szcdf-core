@@ -87,6 +87,11 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 # Set default editor -- always vim <3
 export EDITOR=vim
 
+# Add some default aliases
+alias ll='ls -alF'
+alias la='ls -A'
+alias ls='ls --color=auto'
+
 # Source the shell aliases
 if [[ -f "$HOME/.aliases" ]]; then
   source "$HOME/.aliases"

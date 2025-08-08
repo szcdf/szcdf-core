@@ -56,6 +56,21 @@ szcdf_bin_manager() {
 # $# = 0
 szcdf_bin_manager__init() {
   declare -A SZCDF_BIN_MANAGER__IS_IMPORTED
+
+  # Ensure destination bin directory exists and is on PATH
+  local dest_bin_dir
+  dest_bin_dir="$(szcdf_bin_manager__get_dest_bin_dir)"
+  if [[ ! -d "$dest_bin_dir" ]]; then
+    mkdir -p "$dest_bin_dir"
+  fi
+  case ":$PATH:" in
+    *":$dest_bin_dir:"*)
+      ;;
+    *)
+      export PATH="$dest_bin_dir:$PATH"
+      szcdf_logging__debug "Added '$dest_bin_dir' to PATH."
+      ;;
+  esac
 }
 
 
@@ -99,6 +114,9 @@ szcdf_bin_manager__list() {
 # $# = 1
 # $1 = script file name inside bin.d (basename)
 szcdf_bin_manager__import() {
+  if ! declare -p SZCDF_BIN_MANAGER__IS_IMPORTED >/dev/null 2>&1; then
+    declare -A SZCDF_BIN_MANAGER__IS_IMPORTED
+  fi
   local script_name=$1
   shift || true
 

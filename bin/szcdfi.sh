@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 ###############################################################################
 #
-# szcdfi.sh
-# Stephen Zhao
+# Package: szcdf-core
+# Author: Stephen Zhao (mail@zhaostephen.com)
+# Script Type: Installer
+# Purpose: The installer for szcdf package system.
 
 ######### CONSTANTS ###########################################################
 
@@ -624,7 +626,74 @@ szcdf_install__execute_prependtext() {
     return $RC_SPEC_DIRECTIVE_BADARGS
   fi
 
-  # TODO
+  # Substitute to resolve config root
+  dest_=${dest_//\$CONFIG_ROOT/$CONFIG_ROOT}
+
+  # Validate source exists
+  if [[ ! -f "$PKG_DIR/$source_" ]]; then
+    szcdf_install__display_error "Source file not found: $PKG_DIR/$source_"
+    return $ERROR_FATAL
+  fi
+
+  # Ensure destination directory exists (may create file if missing)
+  if [[ ! -d "$(dirname "$dest_")" ]]; then
+    mkdir -p "$(dirname "$dest_")"
+  fi
+
+  local begin_marker
+  local end_marker
+  begin_marker="$comment_indicator >>>>>>> SZCDF_GENERATED_TEXT // BEGIN SECTION_ID=$section_id // DO NOT EDIT MANUALLY"
+  end_marker="$comment_indicator <<<<<<< SZCDF_GENERATED_TEXT // END SECTION_ID=$section_id // DO NOT EDIT MANUALLY"
+
+  # If destination exists and contains the section, replace its contents
+  if [[ -f "$dest_" ]] \
+    && grep -F -q -- "$begin_marker" "$dest_" \
+    && grep -F -q -- "$end_marker" "$dest_"; then
+
+    local tmp_file
+    tmp_file="$(mktemp)"
+
+    awk -v b="$begin_marker" -v e="$end_marker" -v src_file="$PKG_DIR/$source_" '
+      BEGIN { in_section = 0 }
+      $0 == b {
+        print $0
+        while ((getline line < src_file) > 0) {
+          print line
+        }
+        close(src_file)
+        in_section = 1
+        next
+      }
+      in_section {
+        if ($0 == e) {
+          print $0
+          in_section = 0
+        }
+        next
+      }
+      { print $0 }
+    ' "$dest_" > "$tmp_file"
+
+    mv "$tmp_file" "$dest_"
+
+  else
+    # Otherwise, prepend a new section to the top of the file
+    local tmp_file
+    tmp_file="$(mktemp)"
+
+    {
+      printf "%s\n" "$begin_marker"
+      cat "$PKG_DIR/$source_"
+      printf "%s\n" "$end_marker"
+      if [[ -f "$dest_" ]]; then
+        cat "$dest_"
+      fi
+    } > "$tmp_file"
+
+    mv "$tmp_file" "$dest_"
+  fi
+
+  return 0
 }
 
 szcdf_install__execute_appendtext() {
@@ -673,7 +742,75 @@ szcdf_install__execute_appendtext() {
     return $RC_SPEC_DIRECTIVE_BADARGS
   fi
 
-  # TODO
+  # Substitute to resolve config root
+  dest_=${dest_//\$CONFIG_ROOT/$CONFIG_ROOT}
+
+  # Validate source exists
+  if [[ ! -f "$PKG_DIR/$source_" ]]; then
+    szcdf_install__display_error "Source file not found: $PKG_DIR/$source_"
+    return $ERROR_FATAL
+  fi
+
+  # Ensure destination directory exists (may create file if missing)
+  if [[ ! -d "$(dirname "$dest_")" ]]; then
+    mkdir -p "$(dirname "$dest_")"
+  fi
+
+  local begin_marker
+  local end_marker
+  begin_marker="$comment_indicator >>>>>>> SZCDF_GENERATED_TEXT // BEGIN SECTION_ID=$section_id // DO NOT EDIT MANUALLY"
+  end_marker="$comment_indicator <<<<<<< SZCDF_GENERATED_TEXT // END SECTION_ID=$section_id // DO NOT EDIT MANUALLY"
+
+  # If destination exists and contains the section, replace its contents
+  if [[ -f "$dest_" ]] \
+    && grep -F -q -- "$begin_marker" "$dest_" \
+    && grep -F -q -- "$end_marker" "$dest_"; then
+
+    local tmp_file
+    tmp_file="$(mktemp)"
+
+    awk -v b="$begin_marker" -v e="$end_marker" -v src_file="$PKG_DIR/$source_" '
+      BEGIN { in_section = 0 }
+      $0 == b {
+        print $0
+        while ((getline line < src_file) > 0) {
+          print line
+        }
+        close(src_file)
+        in_section = 1
+        next
+      }
+      in_section {
+        if ($0 == e) {
+          print $0
+          in_section = 0
+        }
+        next
+      }
+      { print $0 }
+    ' "$dest_" > "$tmp_file"
+
+    mv "$tmp_file" "$dest_"
+
+  else
+    # Otherwise, append a new section to the end of the file
+    local tmp_file
+    tmp_file="$(mktemp)"
+
+    if [[ -f "$dest_" ]]; then
+      cat "$dest_" > "$tmp_file"
+    fi
+
+    {
+      printf "%s\n" "$begin_marker"
+      cat "$PKG_DIR/$source_"
+      printf "%s\n" "$end_marker"
+    } >> "$tmp_file"
+
+    mv "$tmp_file" "$dest_"
+  fi
+
+  return 0
 }
 
 

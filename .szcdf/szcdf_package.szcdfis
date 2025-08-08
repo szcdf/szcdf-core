@@ -7,35 +7,22 @@
 COPY src/core-bootstrapper/_bootstrap.sh $CONFIG_ROOT/_bootstrap.sh
 
 # === SZCDF core modules ===
-COPY src/core-modules/startup.sh $CONFIG_ROOT/startup.sh
-COPY src/core-modules/colors.sh $CONFIG_ROOT/colors.sh
-COPY src/core-modules/logging.sh $CONFIG_ROOT/logging.sh
-COPY src/core-modules/module_manager.sh $CONFIG_ROOT/module_manager.sh
-COPY src/core-modules/powerline.sh $CONFIG_ROOT/powerline.sh
-COPY src/core-modules/bin_manager.sh $CONFIG_ROOT/bin_manager.sh
-COPY src/core-modules/preset.sh $CONFIG_ROOT/preset.sh
-COPY src/core-modules/profile.sh $CONFIG_ROOT/profile.sh
-COPY src/core-modules/shinter.sh $CONFIG_ROOT/shinter.sh
+COPYALL src/core-modules $CONFIG_ROOT
 
 # === SZCDF core profiles ===
-COPY src/core-profiles/default $CONFIG_ROOT/profile.d/default
-COPY src/core-profiles/Nordlander__WSL $CONFIG_ROOT/profile.d/Nordlander__WSL
-COPY src/core-profiles/szcdf_tester $CONFIG_ROOT/profile.d/szcdf_tester
+COPYALL src/core-profiles $CONFIG_ROOT/profile.d
 
 # === SZCDF core presets ===
-COPY src/core-presets/add-bash-recommended.sh $CONFIG_ROOT/preset.d/add-bash-recommended.sh
-COPY src/core-presets/set-shell-prompt-powerline-blue.sh $CONFIG_ROOT/preset.d/set-shell-prompt-powerline-blue.sh
-COPY src/core-presets/set-shell-prompt-powerline-gold.sh $CONFIG_ROOT/preset.d/set-shell-prompt-powerline-gold.sh
-COPY src/core-presets/set-shell-prompt-powerline-purple.sh $CONFIG_ROOT/preset.d/set-shell-prompt-powerline-purple.sh
-COPY src/core-presets/set-shell-prompt-standard.sh $CONFIG_ROOT/preset.d/set-shell-prompt-standard.sh
-COPY src/core-presets/add-zhaonetwork1-accessor.sh $CONFIG_ROOT/preset.d/add-zhaonetwork1-accessor.sh
-COPY src/core-presets/add-conda-recommended.sh $CONFIG_ROOT/preset.d/add-conda-recommended.sh
+COPYALL src/core-presets $CONFIG_ROOT/preset.d
 
 # === SZCDF entries ===
 # Add entrypoint calls to all appropriate bash run-command scripts
 PREPENDTEXT src/core-entries/entry-bash.sh .profile ENTRY-BASH
 PREPENDTEXT src/core-entries/entry-bash.sh .bash_profile ENTRY-BASH
 PREPENDTEXT src/core-entries/entry-bash.sh .bashrc ENTRY-BASH
+
+# === SZCDF scripts ===
+COPYALL src/core-bin $CONFIG_ROOT/bin.d
 
 #;;
 #;; Shell files

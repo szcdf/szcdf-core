@@ -345,6 +345,9 @@ szcdf_install__preview_spec_command() {
     COPY)
       szcdf_install__preview_copy "$@"
       ;;
+    COPYALL)
+      szcdf_install__preview_copyall "$@"
+      ;;
     PREPENDTEXT)
       szcdf_install__preview_prependtext "$@"
       ;;
@@ -398,6 +401,42 @@ szcdf_install__preview_copy() {
   fi
 
   szcdf_install__display_output "Copy file(s) from $PKG_DIR/$source_ to $dest_"
+}
+
+szcdf_install__preview_copyall() {
+  # Parse args
+  local source_dir
+  local dest_dir
+  while [[ $# -gt 0 ]]; do
+    local arg=$1
+    shift
+    case "$arg" in
+      # Positional
+      *)
+        if [[ -z "$source_dir" ]]; then
+          source_dir=$arg # required
+        elif [[ -z "$dest_dir" ]]; then
+          dest_dir=$arg # required
+        fi
+        ;;
+    esac
+  done
+
+  local badargs=0
+  if [[ -z "$source_dir" ]]; then
+    szcdf_install__display_warning "Required arg <source_dir> missing for COPYALL directive."
+    badargs=1
+  fi
+  if [[ -z "$dest_dir" ]]; then
+    szcdf_install__display_warning "Required arg <dest_dir> missing for COPYALL directive."
+    badargs=1
+  fi
+
+  if [[ $badargs == 1 ]]; then
+    return $RC_SPEC_DIRECTIVE_BADARGS
+  fi
+
+  szcdf_install__display_output "Copy all file(s) from $PKG_DIR/$source_dir to $dest_dir"
 }
 
 szcdf_install__preview_prependtext() {
@@ -507,6 +546,9 @@ szcdf_install__execute_spec_command() {
     COPY)
       szcdf_install__execute_copy "$@"
       ;;
+    COPYALL)
+      szcdf_install__execute_copyall "$@"
+      ;;
     PREPENDTEXT)
       szcdf_install__execute_prependtext "$@"
       ;;
@@ -578,6 +620,70 @@ szcdf_install__execute_copy() {
   fi
   # Create the link
   ln -vs "$PKG_DIR/$source_" "$dest_"
+}
+
+szcdf_install__execute_copyall() {
+  # Parse args
+  local source_dir
+  local dest_dir
+  while [[ $# -gt 0 ]]; do
+    local arg=$1
+    shift
+    case "$arg" in
+      # Positional
+      *)
+        if [[ -z "$source_dir" ]]; then
+          source_dir=$arg # required
+        elif [[ -z "$dest_dir" ]]; then
+          dest_dir=$arg # required
+        fi
+        ;;
+    esac
+  done
+
+  local badargs=0
+  if [[ -z "$source_dir" ]]; then
+    szcdf_install__display_warning "Required arg <source_dir> missing for COPYALL directive."
+    badargs=1
+  fi
+  if [[ -z "$dest_dir" ]]; then
+    szcdf_install__display_warning "Required arg <dest_dir> missing for COPYALL directive."
+    badargs=1
+  fi
+  if [[ $badargs = 1 ]]; then
+    return $RC_SPEC_DIRECTIVE_BADARGS
+  fi
+
+  local src_abs
+  src_abs="$PKG_DIR/$source_dir"
+
+  # Validate source directory exists
+  if [[ ! -d "$src_abs" ]]; then
+    szcdf_install__display_error "Source directory not found: $src_abs"
+    return $ERROR_FATAL
+  fi
+
+  # Iterate direct files under source_dir and run COPY for each (non-recursive)
+  local rc
+  rc=0
+  while IFS= read -r -d '' src_file_abs; do
+    # Build COPY args using the provided src/dest with basename appended
+    local base
+    base="$(basename "$src_file_abs")"
+    local src_arg
+    src_arg="$source_dir/$base"
+    local dest_file
+    dest_file="$dest_dir/$base"
+
+    szcdf_install__execute_copy "$src_arg" "$dest_file"
+    local copy_rc=$?
+    if [[ $copy_rc -ne 0 ]]; then
+      rc=$copy_rc
+      break
+    fi
+  done < <(find "$src_abs" -maxdepth 1 -print0)
+
+  return $rc
 }
 
 szcdf_install__execute_prependtext() {

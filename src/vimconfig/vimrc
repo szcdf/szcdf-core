@@ -113,7 +113,7 @@ set noshowmode
 " Configure loaded plugins
 if SZCDF_VIM__PLUGIN_MANAGER ==# 'VUNDLE'
   if SZCDF_VIM__PROFILE_OR_DEFAULT ==# 'PROFILE'
-    let SZCDF_VIM__CONFIGURE_VIMRC = SZCDF_VIM__CONFIG_DIR . '/profile.d/profile-' . $SZCDF_PROFILE . '/configure.vim'
+    let SZCDF_VIM__CONFIGURE_VIMRC = SZCDF_VIM__CONFIG_DIR . '/profile.d/' . $SZCDF_PROFILE . '/configure.vim'
   elseif SZCDF_VIM__PROFILE_OR_DEFAULT ==# 'DEFAULT'
     let SZCDF_VIM__CONFIGURE_VIMRC = SZCDF_VIM__CONFIG_DIR . '/profile.d/default/configure.vim'
   endif

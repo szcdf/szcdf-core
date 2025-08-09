@@ -1,8 +1,10 @@
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "
-" szc_vim
-" profile.d/default/configure.vim
-" Stephen Zhao
+" Package: szcdf-core
+" Author: Stephen Zhao (mail@zhaostephen.com)
+" Script Type: Vim Config
+" Profile: default
+" Purpose: Configure vim for the default profile.
 
 " Configure colorscheme
 colorscheme orbital

@@ -20,12 +20,12 @@ else
 fi
 
 if [[ ! -d $HOME/.keychain ]]; then
-  szc_logging__warning "Directory $HOME/.keychain not found. Skipping keychain setup..."
+  szcdf_logging__warning "Directory $HOME/.keychain not found. Skipping keychain setup..."
   return
 fi
 
 if [[ ! -e $HOME/.keychain/$(hostname)-sh ]]; then
-  szc_logging__warning "No keys found in keychain. Skipping keychain setup..."
+  szcdf_logging__warning "No keys found in keychain. Skipping keychain setup..."
   return
 fi
 

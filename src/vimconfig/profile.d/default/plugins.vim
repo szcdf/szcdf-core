@@ -1,8 +1,10 @@
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "
-" szc_vim
-" profile.d/default/plugins.vim
-" Stephen Zhao
+" Package: szcdf-core
+" Author: Stephen Zhao (mail@zhaostephen.com)
+" Script Type: Vim Config
+" Profile: default
+" Purpose: Configure vim for the default profile.
 
 " ======= Default vim Plugins =================================================
 

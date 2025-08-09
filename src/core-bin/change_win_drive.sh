@@ -9,8 +9,6 @@
 szcdf_logging__debug "Changing Windows drive letter..."
 
 # Get the drive letter
-local drive_letter=$1
-
-cd /mnt/$drive_letter
+cd /mnt/$1
 
 szcdf_logging__debug "Finished changing Windows drive letter."

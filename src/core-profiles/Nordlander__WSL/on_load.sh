@@ -9,10 +9,6 @@
 
 szcdf_logging__begin_context 'core-profiles/Nordlander__WSL'
 
-szcdf_logging__debug "Loading required modules for profile 'Nordlander__WSL'..."
-
-szcdf_logging__debug "Finished loading required modules for profile 'Nordlander__WSL'."
-
 szcdf_logging__debug "Registering presets for profile 'Nordlander__WSL'..."
 
 szcdf_preset register add-bash-recommended
@@ -35,7 +31,13 @@ szcdf_logging__debug "Finished adding other env variables."
 
 szcdf_logging__debug "Adding some common aliases..."
 
-alias cdpr='cd /mnt/e/Projects/Dev'
+alias cdprl='cd /home/stephen/projects'
+alias cdprw='cd /mnt/e/Projects/Dev'
+
+szcdf_module_manager load link_syncer
+szcdf_link_syncer ensure_link \
+  "$SZCDF_G__ROOT_DIR/data/mail_zhaostephen_com.gitconfig" \
+  "$HOME/.gitconfig"
 
 szcdf_logging__debug "Finished adding some common aliases."
 

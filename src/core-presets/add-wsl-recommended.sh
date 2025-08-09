@@ -3,7 +3,7 @@
 #
 # Package: szcdf-core
 # Author: Stephen Zhao (mail@zhaostephen.com)
-# Script Type: Preset
+# Type: Preset
 # Preset: add-wsl-recommended
 # Purpose: Adds recommended settings for WSL.
 

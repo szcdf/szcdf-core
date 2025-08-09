@@ -3,7 +3,7 @@
 #
 # Package: szcdf-core
 # Author: Stephen Zhao (mail@zhaostephen.com)
-# Script Type: Preset
+# Type: Preset
 # Preset: add-nodejs-dev
 # Purpose: Recommended settings for nodejs development.
 

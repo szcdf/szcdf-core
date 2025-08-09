@@ -3,7 +3,7 @@
 #
 # Package: szcdf-core
 # Author: Stephen Zhao (mail@zhaostephen.com)
-# Script Type: Bootstrapper
+# Type: Bootstrapper Script
 # Purpose: Bootstraps the SZCDF system.
 #
 # This script should generally be sourced from an Entry script.

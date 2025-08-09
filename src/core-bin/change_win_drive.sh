@@ -3,7 +3,7 @@
 #
 # Package: szcdf-core
 # Author: Stephen Zhao (mail@zhaostephen.com)
-# Script Type: Managed User Script
+# Type: Managed User Script
 # Purpose: Changes the Windows drive letter.
 
 szcdf_logging__debug "Changing Windows drive letter..."

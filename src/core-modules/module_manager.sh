@@ -3,7 +3,7 @@
 #
 # Package: szcdf-core
 # Author: Stephen Zhao (mail@zhaostephen.com)
-# Script Type: Module
+# Type: Module
 # Module: module_manager
 # Purpose: Manages the use of modules.
 #

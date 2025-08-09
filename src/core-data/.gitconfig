@@ -1,0 +1,11 @@
+[user]
+	name = Stephen Zhao
+	email = mail@zhaostephen.com
+[push]
+	default = matching
+[color]
+  ui = auto
+[diff "pdfconv"]
+	textconv=pdftohtml -stdout -i
+[credential]
+	helper = /mnt/c/Program\\ Files/Git/mingw64/libexec/git-core/git-credential-manager.exe

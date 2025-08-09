@@ -3,7 +3,7 @@
 #
 # Package: szcdf-core
 # Author: Stephen Zhao (mail@zhaostephen.com)
-# Script Type: Preset
+# Type: Preset
 # Preset: add-conda-recommended
 # Purpose: Recommended settings for conda.
 

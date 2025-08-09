@@ -4,7 +4,7 @@
 # Package: szcdf-core
 # Profile: szcdf_tester
 # Author: Stephen Zhao (mail@zhaostephen.com)
-# Script Type: Profile
+# Type: Profile
 # Purpose: The szcdf_tester profile for szcdf-core.
 
 szcdf_logging__begin_context 'core-profiles/szcdf_tester'

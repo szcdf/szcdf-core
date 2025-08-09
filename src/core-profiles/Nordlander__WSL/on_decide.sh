@@ -4,7 +4,7 @@
 # Package: szcdf-core
 # Profile: Nordlander__WSL
 # Author: Stephen Zhao (mail@zhaostephen.com)
-# Script Type: Profile
+# Type: Profile Decider
 # Purpose: Decides if the Nordlander__WSL profile should be used.
 
 if [[ "$(hostname)" == "Nordlander" && -n $(uname -a | grep -i "Microsoft") ]]; then

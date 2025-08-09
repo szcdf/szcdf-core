@@ -3,7 +3,7 @@
 #
 # Package: szcdf-core
 # Author: Stephen Zhao (mail@zhaostephen.com)
-# Script Type: Preset
+# Type: Preset
 # Preset: add-zhaonetwork1-accessor
 # Purpose: Adds the zhaonetwork1 SSH keys to the keychain.
 

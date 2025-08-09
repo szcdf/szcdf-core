@@ -3,7 +3,7 @@
 #
 # Package: szcdf-core
 # Author: Stephen Zhao (mail@zhaostephen.com)
-# Script Type: Module
+# Type: Module
 # Module: profile
 # Purpose: Can be used to define and handle profiles.
 #

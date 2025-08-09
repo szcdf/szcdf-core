@@ -4,7 +4,7 @@
 # Package: szcdf-core
 # Profile: szcdf_tester
 # Author: Stephen Zhao (mail@zhaostephen.com)
-# Script Type: Profile
+# Type: Profile Decider
 # Purpose: Decides if the szcdf_tester profile should be used.
 
 if [[ "$(hostname)" == "szcdf-tester" ]]; then

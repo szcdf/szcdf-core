@@ -1,7 +1,11 @@
 ###############################################################################
 #
-# szcdf_package.szcdfis
-# Stephen Zhao
+# Package: szcdf-core
+# Author: Stephen Zhao (mail@zhaostephen.com)
+# Type: SZCDF Install Spec
+
+# === Installer ===
+COPY bin/szcdfi.sh $HOME/.local/bin/szcdfi.sh
 
 # === bootstrapping ===
 COPY src/core-bootstrapper/_bootstrap.sh $CONFIG_ROOT/_bootstrap.sh
@@ -17,9 +21,9 @@ COPYALL src/core-presets $CONFIG_ROOT/preset.d
 
 # === SZCDF entries ===
 # Add entrypoint calls to all appropriate bash run-command scripts
-PREPENDTEXT src/core-entries/entry-bash.sh .profile ENTRY-BASH
-PREPENDTEXT src/core-entries/entry-bash.sh .bash_profile ENTRY-BASH
-PREPENDTEXT src/core-entries/entry-bash.sh .bashrc ENTRY-BASH
+PREPENDTEXT src/core-entries/entry-bash.sh $HOME/.profile ENTRY-BASH
+PREPENDTEXT src/core-entries/entry-bash.sh $HOME/.bash_profile ENTRY-BASH
+PREPENDTEXT src/core-entries/entry-bash.sh $HOME/.bashrc ENTRY-BASH
 
 # === SZCDF core bins ===
 COPYALL src/core-bin $CONFIG_ROOT/bin

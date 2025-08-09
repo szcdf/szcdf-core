@@ -2,7 +2,17 @@
 
 The core component of the SZCDF (Stephen Zhao Configuration Dot Files) system.
 
-## How to Test
+## How to Use
+
+Run the following command:
+```sh
+git clone git@github.com:szcdf/szcdf-core.git && cd szcdf-core && make install
+```
+Then follow the instructions in the installer.
+
+## How to Develop
+
+### How to Test
 
 Prerequisite: docker.
 

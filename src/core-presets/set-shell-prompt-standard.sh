@@ -3,7 +3,7 @@
 #
 # Package: szcdf-core
 # Author: Stephen Zhao (mail@zhaostephen.com)
-# Script Type: Preset
+# Type: Preset
 # Preset: set-shell-prompt-standard
 # Purpose: Sets up the standard shell prompt.
 

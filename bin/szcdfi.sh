@@ -3,7 +3,7 @@
 #
 # Package: szcdf-core
 # Author: Stephen Zhao (mail@zhaostephen.com)
-# Script Type: Installer
+# Type: Installer
 # Purpose: The installer for szcdf package system.
 
 ######### CONSTANTS ###########################################################
@@ -170,7 +170,7 @@ szcdf_install__main() {
 }
 
 szcdf_install__get_default_spec_file_from_pkg_dir() {
-  echo "$1/.szcdf/szcdf_package.szcdfis"
+  echo "$1/.szcdfis"
 }
 
 
@@ -586,8 +586,7 @@ szcdf_install__execute_copy() {
     esac
   done
 
-  # Substitute to resolve config root
-  dest_=${dest_//\$CONFIG_ROOT/$CONFIG_ROOT}
+  dest_="$(szcdf_install__resolve_path "$dest_")"
 
   # Check if destination already exists
   if [[ -e "$dest_" ]]; then
@@ -732,8 +731,7 @@ szcdf_install__execute_prependtext() {
     return $RC_SPEC_DIRECTIVE_BADARGS
   fi
 
-  # Substitute to resolve config root
-  dest_=${dest_//\$CONFIG_ROOT/$CONFIG_ROOT}
+  dest_="$(szcdf_install__resolve_path "$dest_")"
 
   # Validate source exists
   if [[ ! -f "$PKG_DIR/$source_" ]]; then
@@ -848,8 +846,7 @@ szcdf_install__execute_appendtext() {
     return $RC_SPEC_DIRECTIVE_BADARGS
   fi
 
-  # Substitute to resolve config root
-  dest_=${dest_//\$CONFIG_ROOT/$CONFIG_ROOT}
+  dest_="$(szcdf_install__resolve_path "$dest_")"
 
   # Validate source exists
   if [[ ! -f "$PKG_DIR/$source_" ]]; then
@@ -917,6 +914,30 @@ szcdf_install__execute_appendtext() {
   fi
 
   return 0
+}
+
+
+######### UTILITY #############################################################
+
+szcdf_install__resolve_path() {
+  # Parse args
+  local path
+  while [[ $# -gt 0 ]]; do
+    local arg=$1
+    shift
+    case "$arg" in
+      # Positional
+      *)
+        path=$arg # required
+        ;;
+    esac
+  done
+
+  # Substitute to resolve config root
+  path=${path//\$CONFIG_ROOT/$CONFIG_ROOT}
+  path=${path//\$HOME/$HOME}
+
+  echo "$path"
 }
 
 

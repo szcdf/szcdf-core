@@ -4,7 +4,7 @@
 # Package: szcdf-core
 # Profile: Nordlander__WSL
 # Author: Stephen Zhao (mail@zhaostephen.com)
-# Script Type: Profile
+# Type: Profile
 # Purpose: The Nordlander__WSL profile for szcdf-core.
 
 szcdf_logging__begin_context 'core-profiles/Nordlander__WSL'

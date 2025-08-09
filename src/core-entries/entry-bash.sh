@@ -3,7 +3,7 @@
 #
 # Package: szcdf-core
 # Author: Stephen Zhao (mail@zhaostephen.com)
-# Script Type: Entry
+# Type: Entry Script
 # Entry Target: bash
 # Purpose: The entry point for the SZCDF system when bash is the shell.
 #

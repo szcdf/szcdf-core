@@ -3,7 +3,7 @@
 #
 # Package: szcdf-core
 # Author: Stephen Zhao (mail@zhaostephen.com)
-# Script Type: Module
+# Type: Module
 # Module: startup
 # Purpose: The entry point for the SZCDF system.
 #

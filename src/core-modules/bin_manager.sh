@@ -3,7 +3,7 @@
 #
 # Package: szcdf-core
 # Author: Stephen Zhao (mail@zhaostephen.com)
-# Script Type: Module
+# Type: Module
 # Module: bin_manager
 # Purpose: Manages user-invocable scripts under bin by importing them
 #          into ~/.local/bin so they are available on $PATH.

@@ -4,7 +4,7 @@
 # Package: szcdf-core
 # Profile: default
 # Author: Stephen Zhao (mail@zhaostephen.com)
-# Script Type: Profile
+# Type: Profile
 # Purpose: The default profile for szcdf-core.
 
 szcdf_logging__begin_context 'core-profiles/default'

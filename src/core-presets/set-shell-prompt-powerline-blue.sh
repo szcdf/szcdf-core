@@ -3,7 +3,7 @@
 #
 # Package: szcdf-core
 # Author: Stephen Zhao (mail@zhaostephen.com)
-# Script Type: Preset
+# Type: Preset
 # Preset: set-shell-prompt-powerline-blue
 # Purpose: Sets up the powerline prompt in blue.
 

@@ -20,6 +20,7 @@ szcdf_preset register add-wsl-recommended
 szcdf_preset register add-zhaonetwork1-accessor
 szcdf_preset register add-vim-managed
 szcdf_preset register add-conda-recommended
+szcdf_preset register add-nodejs-dev
 szcdf_preset register use-nord-theme
 szcdf_preset register set-shell-prompt-powerline-blue
 

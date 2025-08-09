@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ###############################################################################
 #
 # Package: szcdf-core
@@ -16,6 +16,8 @@ if [[ ! -e "$HOME/miniconda3/bin/conda" ]]; then
   return 0
 fi
 
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
 __conda_setup="$("$HOME/miniconda3/bin/conda" 'shell.bash' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
   eval "$__conda_setup"
@@ -27,6 +29,7 @@ else
   fi
 fi
 unset __conda_setup
+# <<< conda initialize <<<
 
 szcdf_logging__debug "Finished running add-conda-recommended."
 

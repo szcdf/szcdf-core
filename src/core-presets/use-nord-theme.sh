@@ -11,7 +11,7 @@ szcdf_logging__debug "Using the Nord theme..."
 
 # Set directory colors for ls listings
 if [ -x /usr/bin/dircolors ]; then
-  test -r $SZCDF_G__ROOT_DIR/data.d/shell/dircolors-nord && eval "$(dircolors -b $SZCDF_G__ROOT_DIR/data.d/shell/dircolors-nord)" || eval "$(dircolors -b)"
+  test -r $SZCDF_G__ROOT_DIR/data.d/.dircolors-nord && eval "$(dircolors -b $SZCDF_G__ROOT_DIR/data.d/.dircolors-nord)" || eval "$(dircolors -b)"
 fi
 
 szcdf_logging__debug "Finished using the Nord theme."

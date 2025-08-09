@@ -4,27 +4,27 @@
 # Package: szcdf-core
 # Author: Stephen Zhao (mail@zhaostephen.com)
 # Script Type: Module
-# Module: vim
+# Module: vimconfig
 # Purpose: Manage vim settings.
 #
 # To load this module, run
 # ```bash
-# szcdf_module_manager load vim
+# szcdf_module_manager load vimconfig
 # ```
 
 # This is a module to control & manage vim settings
 
 ######### MAIN ################################################################
 
-szcdf_vim() {
-  szcdf_logging__begin_context "szcdf_vim"
+szcdf_vimconfig() {
+  szcdf_logging__begin_context "szcdf_vimconfig"
 
   local subcommand=$1
   shift
 
   case $subcommand in
     install-configs)
-      szcdf_vim__install_configs
+      szcdf_vimconfig__install_configs
       ;;
     *)
       szcdf_logging__warning "Invalid args: $@"
@@ -38,21 +38,21 @@ szcdf_vim() {
 ######### SUBCOMMANDS #########################################################
 
 # $# = 0
-szcdf_vim__install_configs() {
-  SZCDF_VIM__INSTALL_CONFIGS_ERROR=
+szcdf_vimconfig__install_configs() {
+  SZCDF_VIMCONFIG__INSTALL_CONFIGS_ERROR=
   
   # Check to see if vim is even installed
   if ! command -v vim &> "/dev/null"; then
-    SZCDF_VIM__INSTALL_CONFIGS_ERROR="vim not installed. Skipping preset..."
-    szcdf_logging__warning $SZCDF_VIM__INSTALL_CONFIGS_ERROR
+    SZCDF_VIMCONFIG__INSTALL_CONFIGS_ERROR="vim not installed. Skipping preset..."
+    szcdf_logging__warning $SZCDF_VIMCONFIG__INSTALL_CONFIGS_ERROR
     return
   fi
 
   # Validate directories are free to install into
   # else create them
   if [[ -f "$HOME/.vim" ]]; then
-    SZCDF_VIM__INSTALL_CONFIGS_ERROR="~/.vim exists, but is a regular file. Cannot load preset!"
-    szcdf_logging__error $SZCDF_VIM__INSTALL_CONFIGS_ERROR
+    SZCDF_VIMCONFIG__INSTALL_CONFIGS_ERROR="~/.vim exists, but is a regular file. Cannot load preset!"
+    szcdf_logging__error $SZCDF_VIMCONFIG__INSTALL_CONFIGS_ERROR
     return
   elif [[ -d "$HOME/.vim" ]]; then
     :
@@ -60,8 +60,8 @@ szcdf_vim__install_configs() {
     mkdir "$HOME/.vim"
   fi
   if [[ -f "$HOME/.vim/bundle" ]]; then
-    SZCDF_VIM__INSTALL_CONFIGS_ERROR="~/.vim/bundle exists, but is a regular file. Cannot load preset!"
-    szcdf_logging__error $SZCDF_VIM__INSTALL_CONFIGS_ERROR
+    SZCDF_VIMCONFIG__INSTALL_CONFIGS_ERROR="~/.vim/bundle exists, but is a regular file. Cannot load preset!"
+    szcdf_logging__error $SZCDF_VIMCONFIG__INSTALL_CONFIGS_ERROR
     return
   elif [[ -d "$HOME/.vim/bundle" ]]; then
     :
@@ -104,8 +104,8 @@ szcdf_vim__install_configs() {
   if [[ -z "$vimrc_new_target" ]]; then
     if [[ -z "$vimrc_old_target" ]]; then
       # Both old and new targets empty, preset cannot be loaded
-      SZCDF_VIM__INSTALL_CONFIGS_ERROR="No vimrc found. The szcdf_vim module must be corrupted. Cannot load preset! Please reinstall."
-      szcdf_logging__error "$SZCDF_VIM__INSTALL_CONFIGS_ERROR"
+      SZCDF_VIMCONFIG__INSTALL_CONFIGS_ERROR="No vimrc found. The szcdf_vimconfig module must be corrupted. Cannot load preset! Please reinstall."
+      szcdf_logging__error "$SZCDF_VIMCONFIG__INSTALL_CONFIGS_ERROR"
       return
     else
       # Only new target is empty, so just fallback load the preset using the old target
@@ -160,10 +160,10 @@ szcdf_vim__install_configs() {
 ######### CLEANUP #############################################################
 
 # Cleans up all of the functions
-szcdf_vim__cleanup() {
-  unset -f szcdf_vim
+szcdf_vimconfig__cleanup() {
+  unset -f szcdf_vimconfig
 
-  unset -f szcdf_vim__install_configs
+  unset -f szcdf_vimconfig__install_configs
 
-  unset -f szcdf_vim__cleanup
+  unset -f szcdf_vimconfig__cleanup
 }

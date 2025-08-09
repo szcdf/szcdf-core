@@ -18,6 +18,7 @@ szcdf_logging__debug "Finished loading required modules."
 szcdf_logging__debug "Registering presets for profile 'szcdf_tester'..."
 
 szcdf_preset register add-bash-recommended
+szcdf_preset register add-vim-managed
 szcdf_preset register set-shell-prompt-powerline-blue
 szcdf_preset register use-nord-theme
 

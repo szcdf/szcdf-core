@@ -9,7 +9,7 @@
 
 szcdf_logging__begin_context 'core-presets/set-shell-prompt-standard'
 
-if ! szcdf_shinter get_is_interactive; then
+if ! szcdf_shinter return_is_interactive; then
 
   szcdf_logging__info "Shell is not interactive. The set-shell-prompt-standard only applies when the shell is interative. Skipping..."
 

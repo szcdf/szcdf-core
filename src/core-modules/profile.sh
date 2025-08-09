@@ -52,7 +52,7 @@ szcdf_profile() {
 szcdf_profile__detect() {
   szcdf_logging__debug "Determining settings profile..."
   local settings_profile
-  for profile_dir in "$SZCDF_G__ROOT_DIR"/profile.d/*; do
+  for profile_dir in "$SZCDF_G__ROOT_DIR"/profiles/*; do
     # Check if profile dir exists
     if [[ ! -d "$profile_dir" ]]; then
       szcdf_logging__warning "Settings profile must have a folder at \"$profile_dir\". Skipping"
@@ -124,7 +124,7 @@ szcdf_profile__load() {
     export SZCDF_PROFILE__IS_LOGIN=
   fi
   # Check if profile dir exists
-  local profile_dir="$SZCDF_G__ROOT_DIR/profile.d/$profile_name"
+  local profile_dir="$SZCDF_G__ROOT_DIR/profiles/$profile_name"
   if [[ ! -d "$profile_dir" ]]; then
     szcdf_logging__warning "Settings profile must have a folder at \"$profile_dir\". Skipping"
     return 1

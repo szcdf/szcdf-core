@@ -79,8 +79,8 @@ szcdf_preset__register() {
     return
   fi
   # Check if preset dir exists
-  local preset_dir="$SZCDF_G__ROOT_DIR/preset.d/$preset_name" 
-  local preset_single_script="$SZCDF_G__ROOT_DIR/preset.d/${preset_name}.sh" 
+  local preset_dir="$SZCDF_G__ROOT_DIR/presets/$preset_name" 
+  local preset_single_script="$SZCDF_G__ROOT_DIR/presets/${preset_name}.sh" 
   if [[ -d  "$preset_dir" ]]; then
     szcdf_logging__debug "Registering preset '$preset_name' as directory..."
     # Enqueue the preset for processing
@@ -196,7 +196,7 @@ szcdf_preset__run_load_single_script() {
     return 1
   fi
   # Source the load script
-  if ! source "$SZCDF_G__ROOT_DIR/preset.d/${preset_name}.sh"; then
+  if ! source "$SZCDF_G__ROOT_DIR/presets/${preset_name}.sh"; then
     SZCDF_PRESET__HAD_FAILURE[$preset_name]=1
     szcdf_logging__warning "Encountered failure when running load script for preset '$preset_name'. Skipping this preset."
     return 1
@@ -231,7 +231,7 @@ szcdf_preset__run_load_stage() {
     return 1
   fi
   # Check if preset dir exists and set it
-  local preset_dir="$SZCDF_G__ROOT_DIR/preset.d/$preset_name" 
+  local preset_dir="$SZCDF_G__ROOT_DIR/presets/$preset_name" 
   if [[ ! -d  "$preset_dir" ]]; then
     szcdf_logging__warning "Preset '$preset_name' must have a dir at \"$preset_dir\". Skipping $load_stage_name (load stage $load_stage_num) scripts."
     return 1

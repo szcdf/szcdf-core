@@ -11,7 +11,7 @@ szcdf_logging__begin_context 'core-presets/add-bash-recommended'
 
 szcdf_logging__debug "Running add-bash-recommended..."
 
-if szcdf_shinter get_is_interactive; then
+if szcdf_shinter return_is_interactive; then
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -71,7 +71,7 @@ fi
 
 LS_COLORS=$LS_COLORS:'di=0;37:' ; export LS_COLORS
 
-fi # szcdf_shinter get_is_interactive
+fi # szcdf_shinter return_is_interactive
 
 # Below are things to do regardless of interactivity
 

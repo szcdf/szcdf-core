@@ -14,6 +14,9 @@ RUN groupadd -g 1001 ahamilton \
 USER ahamilton
 WORKDIR /home/ahamilton
 
+COPY install.sh /home/ahamilton/install.sh
+COPY reset.sh /home/ahamilton/reset.sh
+
 # Run everything else as the user
 
 # RUN echo $user_pass | sudo -S apt install -y \

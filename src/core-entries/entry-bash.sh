@@ -10,7 +10,8 @@
 # This script sources the bootstrapper.
 
 # Only run this if we have not hit an entry point yet
-if [[ -z "$SZCDF_G__ENTRY_POINT" ]]; then
+if [[ -z "$SZCDF_G__IS_RUNNING_ENTRY_POINT" ]]; then
+  export SZCDF_G__IS_RUNNING_ENTRY_POINT=1
 
   if [[ -d "$HOME/.config/szcdf" ]]; then
     export SZCDF_G__ROOT_DIR="$HOME/.config/szcdf"
@@ -24,11 +25,14 @@ if [[ -z "$SZCDF_G__ENTRY_POINT" ]]; then
     if [[ -f "/tmp/SZCDF_G__DEBUG_MODE" ]]; then
       echo "szcdf: Enabling DEBUG MODE"
       export SZCDF_G__DEBUG_MODE=1
+    else
+      export SZCDF_G__DEBUG_MODE=0
     fi
     export SZCDF_G__ENTRY_POINT="${BASH_SOURCE[0]}"
     # Run the bootstrapping, and return 0 if successfully run
     # otherwise, continue running the current script
     if source "$SZCDF_G__ROOT_DIR/_bootstrap.sh"; then
+      unset SZCDF_G__IS_RUNNING_ENTRY_POINT
       return 0
     fi
   fi

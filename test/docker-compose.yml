@@ -6,4 +6,4 @@ services:
       args:
         user_pass: ahamilton
     volumes:
-      - ../../:/szcdf_regi
+      - ../:/szcdf-core

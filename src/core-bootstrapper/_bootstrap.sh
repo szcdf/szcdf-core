@@ -35,10 +35,10 @@ szcdf_bootstrap__try_load_module() {
 }
 
 # 1. Use the bootstrap loader to load the logging module (since the module manager module isn't loaded yet)
-szcdf_bootstrap__try_load_module logging "$SZCDF_G__ROOT_DIR/logging.sh" || return $?
+szcdf_bootstrap__try_load_module logging "$SZCDF_G__ROOT_DIR/modules/logging.sh" || return $?
 
 # 2. Use the bootstrap loader to load the module manager module
-szcdf_bootstrap__try_load_module module_manager "$SZCDF_G__ROOT_DIR/module_manager.sh" || return $?
+szcdf_bootstrap__try_load_module module_manager "$SZCDF_G__ROOT_DIR/modules/module_manager.sh" || return $?
 
 # 3. Load the startup module
 szcdf_module_manager load startup || return $?

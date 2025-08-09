@@ -115,7 +115,7 @@ szcdf_module_manager__load() {
   
   # If no optional path parameter or path was bad, use default location
   if [[ -z "$script" ]]; then
-    path="$SZCDF_G__ROOT_DIR/$module.sh"
+    path="$SZCDF_G__ROOT_DIR/modules/$module.sh"
     szcdf_logging__debug "Checking if module $module exists..."
     if [[ ! -f "$path" ]]; then
       szcdf_logging__error "Module $module does not exist at '$path'! Aborting..."

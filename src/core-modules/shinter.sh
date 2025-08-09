@@ -27,8 +27,8 @@ szcdf_shinter() {
     detect_and_set_is_interactive)
       szcdf_shinter__detect_and_set_is_interactive
       ;;
-    get_is_interactive)
-      szcdf_shinter__get_is_interactive
+    return_is_interactive)
+      szcdf_shinter__return_is_interactive
       ;;
     *)
       szcdf_logging__warning "Invalid args: $*"
@@ -60,14 +60,12 @@ szcdf_shinter__detect_and_set_is_interactive() {
 }
 
 # $# = 0
-# stdout = whether the shell is interactive or not (Y or empty)
 # $? = 0 if interactive, 1 if not
-szcdf_shinter__get_is_interactive() {
+szcdf_shinter__return_is_interactive() {
   if [[ -z "$szcdf_shinter__IS_INTERACTIVE" ]]; then
     szcdf_shinter__detect_and_set_is_interactive
   fi
   if [[ -n "$szcdf_shinter__IS_INTERACTIVE" ]]; then
-    echo Y
     return 0
   else
     return 1
@@ -82,7 +80,7 @@ szcdf_shinter__cleanup() {
 
   unset -f szcdf_shinter__detect_is_interactive
   unset -f szcdf_shinter__detect_and_set_is_interactive
-  unset -f szcdf_shinter__get_is_interactive
+  unset -f szcdf_shinter__return_is_interactive
 
   unset -f szcdf_shinter__cleanup
 }

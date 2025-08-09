@@ -14,7 +14,7 @@ szcdf_module_manager load powerline
 
 szcdf_logging__debug "Setting up PS1..."
 
-if ! szcdf_shinter get_is_interactive; then
+if ! szcdf_shinter return_is_interactive; then
 
   szcdf_logging__info "Shell is not interactive. The set-shell-prompt-powerline-purple only applies when the shell is interative. Skipping..."
 

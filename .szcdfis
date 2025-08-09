@@ -11,13 +11,13 @@ COPY bin/szcdfi.sh $HOME/.local/bin/szcdfi.sh
 COPY src/core-bootstrapper/_bootstrap.sh $CONFIG_ROOT/_bootstrap.sh
 
 # === SZCDF core modules ===
-COPYALL src/core-modules $CONFIG_ROOT
+COPYALL src/core-modules $CONFIG_ROOT/modules
 
 # === SZCDF core profiles ===
-COPYALL src/core-profiles $CONFIG_ROOT/profile.d
+COPYALL src/core-profiles $CONFIG_ROOT/profiles
 
 # === SZCDF core presets ===
-COPYALL src/core-presets $CONFIG_ROOT/preset.d
+COPYALL src/core-presets $CONFIG_ROOT/presets
 
 # === SZCDF entries ===
 # Add entrypoint calls to all appropriate bash run-command scripts
@@ -29,7 +29,7 @@ PREPENDTEXT src/core-entries/entry-bash.sh $HOME/.bashrc ENTRY-BASH
 COPYALL src/core-bin $CONFIG_ROOT/bin
 
 # === SZCDF core data ===
-COPYALL src/core-data $CONFIG_ROOT/data.d
+COPYALL src/core-data $CONFIG_ROOT/data
 
 # === SZCDF vimconfig ===
 COPY src/vimconfig/vimrc $CONFIG_ROOT/vimconfig/vimrc

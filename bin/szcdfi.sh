@@ -691,7 +691,7 @@ szcdf_install__execute_copyall() {
       rc=$copy_rc
       break
     fi
-  done < <(find "$src_abs" -maxdepth 1 -print0)
+  done < <(find "$src_abs" -maxdepth 1 -mindepth 1 -print0)
 
   return $rc
 }

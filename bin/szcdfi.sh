@@ -177,7 +177,18 @@ szcdf_install__get_default_spec_file_from_pkg_dir() {
 ######### HELP ################################################################
 
 szcdf_install__usage() {
-  cat >&2 "$SCRIPT_DIR/../docs/usage.txt"
+  echo >&2 "Usage: szcdfi.sh [-p <dir>] [-s <file>] [-h] [-I] [-i] [-m <mode>]
+
+  Options:
+    -p, --package-dir <dir>  The directory containing the szcdf package. Defaults to the current directory.
+    -s, --spec <file>        The install spec file to use. Defaults to the .szcdfis file in the current directory.
+    -h, --help               Show this help message and exit.
+    -I, --non-interactive    Run in non-interactive mode. Defaults to interactive mode.
+    -i, --interactive        Run in interactive mode.
+    -m, --mode <mode>        The install mode to use.
+      - 1 or quick           Preview all changes and install with one click.
+      - 2 or custom          Preview and install each change with a prompt.
+  "
 }
 
 

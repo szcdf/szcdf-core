@@ -1,0 +1,124 @@
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"
+" Package: szcdf-core
+" Author: Stephen Zhao (mail@zhaostephen.com)
+" Script Type: vimrc
+
+let SZCDF_VIM__PLUGIN_MANAGER = ''
+let SZCDF_VIM__CONFIG_DIR = $SZCDF_G__ROOT_DIR . '/vimconfig'
+if isdirectory($HOME . '/.vim/bundle/Vundle.vim')
+  let SZCDF_VIM__PLUGIN_MANAGER = 'VUNDLE'
+
+  " =============================================================================
+  " Pre-Vundle load plugin vundle stuff
+  " =============================================================================
+
+  set nocompatible              " be iMproved, required
+  filetype off                  " required
+
+  " set the runtime path to include Vundle and initialize
+  set rtp+=~/.vim/bundle/Vundle.vim
+  call vundle#begin()
+  " alternatively, pass a path where Vundle should install plugins
+  "call vundle#begin('~/some/path/here')
+
+  " let Vundle manage Vundle, required
+  Plugin 'VundleVim/Vundle.vim'
+
+  " =============================================================================
+  " VUNDLE PLUGINS
+  " =============================================================================
+
+  " Depending on profile, load different Vundle plugins
+  let SZCDF_VIM__PROFILE_PLUGINS_VIMRC = SZCDF_VIM__CONFIG_DIR . '/profile.d/' . $SZCDF_PROFILE . '/plugins.vim'
+  let SZCDF_VIM__DEFAULT_PLUGINS_VIMRC = SZCDF_VIM__CONFIG_DIR . '/profile.d/default/plugins.vim'
+  if filereadable(SZCDF_VIM__PROFILE_PLUGINS_VIMRC)
+    exec "source " . SZCDF_VIM__PROFILE_PLUGINS_VIMRC
+    let SZCDF_VIM__PROFILE_OR_DEFAULT = 'PROFILE'
+  elseif filereadable(SZCDF_VIM__DEFAULT_PLUGINS_VIMRC)
+    exec "source " . SZCDF_VIM__DEFAULT_PLUGINS_VIMRC
+    let SZCDF_VIM__PROFILE_OR_DEFAULT = 'DEFAULT'
+  endif
+
+  " =============================================================================
+  " Post-Vundle load plugin vundle stuff
+  " =============================================================================
+  
+  " All of your Plugins must be added before the following line
+  call vundle#end()            " required
+  filetype plugin indent on    " required
+  " To ignore plugin indent changes, instead use:
+  "filetype plugin on
+  "
+  " Brief help
+  " :PluginList       - lists configured plugins
+  " :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
+  " :PluginSearch foo - searches for foo; append `!` to refresh local cache
+  " :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
+  "
+  " see :h vundle for more details or wiki for FAQ
+  " Put your non-Plugin stuff after this line
+endif
+
+" =============================================================================
+" Settings
+" =============================================================================
+
+" Set encodings
+set fileencodings=ucs-bom,utf-8,default,latin1
+set encoding=utf-8
+
+" Syntax highlighting (basic)
+syntax on
+
+" Column warning
+set colorcolumn=80
+highlight ColorColumn ctermbg=0
+
+" Fix starting in replace mode for Windows
+set t_u7=
+
+" Line numbers
+set number
+
+" Wrapping
+set nowrap
+
+" Tabbing
+set tabstop=2
+set shiftwidth=2
+set expandtab
+set smarttab
+
+" Enable mouse
+set mouse=a
+
+" Indentation
+"set smartindent
+"set autoindent
+
+" Enable the cursor position in status line
+set ruler
+
+" Padding above/below cursor
+set scrolloff=2
+
+" Colour Scheme
+set background=dark
+
+" Configure status line
+set laststatus=2
+set noshowmode
+
+" Configure loaded plugins
+if SZCDF_VIM__PLUGIN_MANAGER ==# 'VUNDLE'
+  if SZCDF_VIM__PROFILE_OR_DEFAULT ==# 'PROFILE'
+    let SZCDF_VIM__CONFIGURE_VIMRC = SZCDF_VIM__CONFIG_DIR . '/profile.d/profile-' . $SZCDF_PROFILE . '/configure.vim'
+  elseif SZCDF_VIM__PROFILE_OR_DEFAULT ==# 'DEFAULT'
+    let SZCDF_VIM__CONFIGURE_VIMRC = SZCDF_VIM__CONFIG_DIR . '/profile.d/default/configure.vim'
+  endif
+  if filereadable(SZCDF_VIM__CONFIGURE_VIMRC)
+    exec "source " . SZCDF_VIM__CONFIGURE_VIMRC
+  endif
+endif
+

@@ -600,12 +600,12 @@ szcdf_install__execute_copy() {
   dest_="$(szcdf_install__resolve_path "$dest_")"
 
   # Check if destination already exists
-  if [[ -e "$dest_" ]]; then
+  if [[ -e "$dest_" ]] || [[ -L "$dest_" ]]; then
     old_link_target="$(readlink -f "$dest_")"
     # Check old target is the same as new target
     if [[ "$old_link_target" == "$PKG_DIR/$source_" ]]; then
       # If they are equal, skip
-      szcdf_install__display_output "Link '$dest_' exists and already points to '$PKG_DIR/$source_'. Skipping"
+      szcdf_install__display_output "Link '$dest_' exists and already points to '$PKG_DIR/$source_'. Skipping."
       return 0
     fi
     # Check with the user if they want to replace it
@@ -676,7 +676,7 @@ szcdf_install__execute_copyall() {
   # Iterate direct files under source_dir and run COPY for each (non-recursive)
   local rc
   rc=0
-  while IFS= read -r -d '' src_file_abs; do
+  while IFS= read -r -d '' -u 4 src_file_abs; do
     # Build COPY args using the provided src/dest with basename appended
     local base
     base="$(basename "$src_file_abs")"
@@ -691,7 +691,7 @@ szcdf_install__execute_copyall() {
       rc=$copy_rc
       break
     fi
-  done < <(find "$src_abs" -maxdepth 1 -mindepth 1 -print0)
+  done 4< <(find "$src_abs" -maxdepth 1 -mindepth 1 -print0)
 
   return $rc
 }

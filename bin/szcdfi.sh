@@ -635,7 +635,7 @@ szcdf_install__execute_copy() {
         szcdf_install__display_warning "$dest_ will not be created."
         return
       fi
-      rm -f "$dest_"
+      rm -rf "$dest_"
     else
       # In non-editable mode, if the destination is a symlink, prompt to replace
       # it with a regular file copy even if contents match.
@@ -653,12 +653,20 @@ szcdf_install__execute_copy() {
           szcdf_install__display_warning "$dest_ will not be created."
           return
         fi
-        rm -f "$dest_"
+        rm -rf "$dest_"
       else
+        # If it's a directory, check if contents are identical
+        if [[ -d "$dest_" ]]; then
+          if diff -r "$PKG_DIR/$source_" "$dest_" >/dev/null 2>&1; then
+            szcdf_install__display_output "Directory '$dest_' exists and is identical to source. Skipping."
+            return 0
+          fi
         # If it's a regular file and contents are identical, skip
-        if cmp -s "$PKG_DIR/$source_" "$dest_"; then
-          szcdf_install__display_output "File '$dest_' exists and is identical to source. Skipping."
-          return 0
+        elif [[ -f "$dest_" ]]; then
+          if cmp -s "$PKG_DIR/$source_" "$dest_"; then
+            szcdf_install__display_output "File '$dest_' exists and is identical to source. Skipping."
+            return 0
+          fi
         fi
         local prompt_text
         prompt_text=$(echo -en \
@@ -682,7 +690,7 @@ szcdf_install__execute_copy() {
   if [[ "$INSTALL_EDITABLE" == 1 ]]; then
     ln -vs "$PKG_DIR/$source_" "$dest_"
   else
-    cp -vf "$PKG_DIR/$source_" "$dest_"
+    cp -vfr "$PKG_DIR/$source_" "$dest_"
   fi
 }
 

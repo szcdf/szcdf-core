@@ -637,21 +637,41 @@ szcdf_install__execute_copy() {
       fi
       rm -f "$dest_"
     else
-      if cmp -s "$PKG_DIR/$source_" "$dest_"; then
-        szcdf_install__display_output "File '$dest_' exists and is identical to source. Skipping."
-        return 0
+      # In non-editable mode, if the destination is a symlink, prompt to replace
+      # it with a regular file copy even if contents match.
+      if [[ -L "$dest_" ]]; then
+        local link_target
+        link_target="$(readlink -f "$dest_")"
+        local prompt_text
+        prompt_text=$(echo -en \
+          "$(szcdf_install__display_output "The installer wants to replace the symbolic link '$dest_':")""\n"\
+          "$(szcdf_install__display_output_append "Old link target: $(tput setaf 1)$link_target$(tput sgr0)")""\n"\
+          "$(szcdf_install__display_output_append "New regular file from: $(tput setaf 2)$PKG_DIR/$source_$(tput sgr0)")""\n"\
+          "$(szcdf_install__display_output_append "Replace?")"\
+        )
+        if ! szcdf_install__prompt_confirmation_is_yes "$prompt_text"; then
+          szcdf_install__display_warning "$dest_ will not be created."
+          return
+        fi
+        rm -f "$dest_"
+      else
+        # If it's a regular file and contents are identical, skip
+        if cmp -s "$PKG_DIR/$source_" "$dest_"; then
+          szcdf_install__display_output "File '$dest_' exists and is identical to source. Skipping."
+          return 0
+        fi
+        local prompt_text
+        prompt_text=$(echo -en \
+          "$(szcdf_install__display_output "The installer wants to replace the file '$dest_':")""\n"\
+          "$(szcdf_install__display_output_append "New contents from: $(tput setaf 2)$PKG_DIR/$source_$(tput sgr0)")""\n"\
+          "$(szcdf_install__display_output_append "Replace?")"\
+        )
+        if ! szcdf_install__prompt_confirmation_is_yes "$prompt_text"; then
+          szcdf_install__display_warning "$dest_ will not be created."
+          return
+        fi
+        # cp will overwrite with -f, no need to remove explicitly
       fi
-      local prompt_text
-      prompt_text=$(echo -en \
-        "$(szcdf_install__display_output "The installer wants to replace the file '$dest_':")""\n"\
-        "$(szcdf_install__display_output_append "New contents from: $(tput setaf 2)$PKG_DIR/$source_$(tput sgr0)")""\n"\
-        "$(szcdf_install__display_output_append "Replace?")"\
-      )
-      if ! szcdf_install__prompt_confirmation_is_yes "$prompt_text"; then
-        szcdf_install__display_warning "$dest_ will not be created."
-        return
-      fi
-      # cp will overwrite with -f, no need to remove explicitly
     fi
   fi
   # Check to see if directory exists, otherwise make a directory

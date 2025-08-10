@@ -14,6 +14,7 @@ szcdf_logging__debug "Registering presets for profile 'Nordlander__WSL'..."
 szcdf_preset register add-bash-recommended
 szcdf_preset register add-wsl-recommended
 szcdf_preset register add-zhaonetwork1-accessor
+szcdf_preset register add-ssh-mail-zhaostephen-com
 szcdf_preset register add-vim-managed
 szcdf_preset register add-conda-recommended
 szcdf_preset register add-nodejs-dev

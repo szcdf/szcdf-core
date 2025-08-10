@@ -15,7 +15,7 @@ if [[ ! -e /usr/bin/keychain ]]; then
   szcdf_logging__warning "/usr/bin/keychain is missing, but required to store the SSH keys. Skipping preset add-ssh-ids-to-keychain."
 else
   for key in "$HOME"/.ssh/id_*; do
-    if [[ -e "$key" ]]; then
+    if [[ -e "$key" ]] && [[ ! "$key" == *.pub ]]; then
       /usr/bin/keychain "$key"
     fi
   done

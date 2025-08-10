@@ -40,6 +40,12 @@ szcdf_link_syncer ensure_link \
   "$SZCDF_G__ROOT_DIR/data/mail_zhaostephen_com.gitconfig" \
   "$HOME/.gitconfig"
 
+szcdf_module_manager load text_section_syncer
+szcdf_text_section_syncer ensure_text_section_or_prepend \
+  "$HOME/.ssh/config" \
+  "$SZCDF_G__ROOT_DIR/data/mail_zhaostephen_com.github.sshconfig" \
+  "SSHCONFIG_GITHUB_MAIL_ZHAOSTEPEN_COM"
+
 szcdf_logging__debug "Finished adding some common aliases."
 
 szcdf_logging__end_context

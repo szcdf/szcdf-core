@@ -1,0 +1,6 @@
+Host github.com
+    Hostname github.com
+    IdentityFile ~/.ssh/id_ed25519.mail_zhaostephen_com.github
+    IdentitiesOnly yes
+    AddKeysToAgent yes
+    User git

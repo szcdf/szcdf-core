@@ -84,6 +84,9 @@ szcdf_install__main() {
           return $ERROR_FATAL
         fi
         ;;
+      -e|--editable)
+        INSTALL_EDITABLE=1
+        ;;
       *)
         echo >&2 "Invalid argument: $arg"
         echo >&2 ""
@@ -145,6 +148,11 @@ szcdf_install__main() {
     IS_INTERACTIVE=1
   fi
 
+  # Default to non-editable (copy) mode if not specified
+  if [[ -z "$INSTALL_EDITABLE" ]]; then
+    INSTALL_EDITABLE=0
+  fi
+
   # Display intro
 
   szcdf_install__display_intro
@@ -177,7 +185,7 @@ szcdf_install__get_default_spec_file_from_pkg_dir() {
 ######### HELP ################################################################
 
 szcdf_install__usage() {
-  echo >&2 "Usage: szcdfi.sh [-p <dir>] [-s <file>] [-h] [-I] [-i] [-m <mode>]
+  echo >&2 "Usage: szcdfi.sh [-p <dir>] [-s <file>] [-h] [-I] [-i] [-m <mode>] [-e]
 
   Options:
     -p, --package-dir <dir>  The directory containing the szcdf package. Defaults to the current directory.
@@ -188,6 +196,7 @@ szcdf_install__usage() {
     -m, --mode <mode>        The install mode to use.
       - 1 or quick           Preview all changes and install with one click.
       - 2 or custom          Preview and install each change with a prompt.
+    -e, --editable           Use symbolic links instead of copying files (recommended for development/testing).
   "
 }
 
@@ -411,7 +420,11 @@ szcdf_install__preview_copy() {
     return $RC_SPEC_DIRECTIVE_BADARGS
   fi
 
-  szcdf_install__display_output "Copy file(s) from $PKG_DIR/$source_ to $dest_"
+  if [[ "$INSTALL_EDITABLE" == 1 ]]; then
+    szcdf_install__display_output "Link file(s) from $PKG_DIR/$source_ to $dest_"
+  else
+    szcdf_install__display_output "Copy file(s) from $PKG_DIR/$source_ to $dest_"
+  fi
 }
 
 szcdf_install__preview_copyall() {
@@ -447,7 +460,11 @@ szcdf_install__preview_copyall() {
     return $RC_SPEC_DIRECTIVE_BADARGS
   fi
 
-  szcdf_install__display_output "Copy all file(s) from $PKG_DIR/$source_dir to $dest_dir"
+  if [[ "$INSTALL_EDITABLE" == 1 ]]; then
+    szcdf_install__display_output "Link all file(s) from $PKG_DIR/$source_dir to $dest_dir"
+  else
+    szcdf_install__display_output "Copy all file(s) from $PKG_DIR/$source_dir to $dest_dir"
+  fi
 }
 
 szcdf_install__preview_prependtext() {
@@ -601,35 +618,52 @@ szcdf_install__execute_copy() {
 
   # Check if destination already exists
   if [[ -e "$dest_" ]] || [[ -L "$dest_" ]]; then
-    old_link_target="$(readlink -f "$dest_")"
-    # Check old target is the same as new target
-    if [[ "$old_link_target" == "$PKG_DIR/$source_" ]]; then
-      # If they are equal, skip
-      szcdf_install__display_output "Link '$dest_' exists and already points to '$PKG_DIR/$source_'. Skipping."
-      return 0
+    if [[ "$INSTALL_EDITABLE" == 1 ]]; then
+      old_link_target="$(readlink -f "$dest_")"
+      if [[ "$old_link_target" == "$PKG_DIR/$source_" ]]; then
+        szcdf_install__display_output "Link '$dest_' exists and already points to '$PKG_DIR/$source_'. Skipping."
+        return 0
+      fi
+      local prompt_text
+      prompt_text=$(echo -en \
+        "$(szcdf_install__display_output "The installer wants to replace the file '$dest_':")""\n"\
+        "$(szcdf_install__display_output_append "Old target: $(tput setaf 1)$old_link_target$(tput sgr0)")""\n"\
+        "$(szcdf_install__display_output_append "New target: $(tput setaf 2)$PKG_DIR/$source_$(tput sgr0)")""\n"\
+        "$(szcdf_install__display_output_append "Replace?")"\
+      )
+      if ! szcdf_install__prompt_confirmation_is_yes "$prompt_text"; then
+        szcdf_install__display_warning "$dest_ will not be created."
+        return
+      fi
+      rm -f "$dest_"
+    else
+      if cmp -s "$PKG_DIR/$source_" "$dest_"; then
+        szcdf_install__display_output "File '$dest_' exists and is identical to source. Skipping."
+        return 0
+      fi
+      local prompt_text
+      prompt_text=$(echo -en \
+        "$(szcdf_install__display_output "The installer wants to replace the file '$dest_':")""\n"\
+        "$(szcdf_install__display_output_append "New contents from: $(tput setaf 2)$PKG_DIR/$source_$(tput sgr0)")""\n"\
+        "$(szcdf_install__display_output_append "Replace?")"\
+      )
+      if ! szcdf_install__prompt_confirmation_is_yes "$prompt_text"; then
+        szcdf_install__display_warning "$dest_ will not be created."
+        return
+      fi
+      # cp will overwrite with -f, no need to remove explicitly
     fi
-    # Check with the user if they want to replace it
-    local prompt_text
-    prompt_text=$(echo -en \
-      "$(szcdf_install__display_output "The installer wants to replace the file '$dest_':")""\n"\
-      "$(szcdf_install__display_output_append "Old target: $(tput setaf 1)$old_link_target$(tput sgr0)")""\n"\
-      "$(szcdf_install__display_output_append "New target: $(tput setaf 2)$PKG_DIR/$source_$(tput sgr0)")""\n"\
-      "$(szcdf_install__display_output_append "Replace?")"\
-    )
-    if ! szcdf_install__prompt_confirmation_is_yes "$prompt_text"; then
-      szcdf_install__display_warning "$dest_ will not be created."
-      return
-    fi
-    # Finally, if pass all checks, then proceed
-    # Remove the old link
-    rm "$dest_"
   fi
   # Check to see if directory exists, otherwise make a directory
   if [[ ! -e "$(dirname "$dest_")" ]]; then
     mkdir -p "$(dirname "$dest_")"
   fi
-  # Create the link
-  ln -vs "$PKG_DIR/$source_" "$dest_"
+  # Create link or copy file based on mode
+  if [[ "$INSTALL_EDITABLE" == 1 ]]; then
+    ln -vs "$PKG_DIR/$source_" "$dest_"
+  else
+    cp -vf "$PKG_DIR/$source_" "$dest_"
+  fi
 }
 
 szcdf_install__execute_copyall() {

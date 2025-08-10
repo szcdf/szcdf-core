@@ -32,8 +32,8 @@ COPYALL src/core-bin $CONFIG_ROOT/bin
 COPYALL src/core-data $CONFIG_ROOT/data
 
 # === SZCDF vimconfig ===
-COPY src/vimconfig/vimrc $CONFIG_ROOT/vimconfig/vimrc
-COPYALL src/vimconfig/profile.d $CONFIG_ROOT/vimconfig/profile.d
+COPY src/core-vimconfig/vimrc $CONFIG_ROOT/vimconfig/vimrc
+COPYALL src/core-vimconfig/profile.d $CONFIG_ROOT/vimconfig/profile.d
 
 #;;
 #;; Shell files

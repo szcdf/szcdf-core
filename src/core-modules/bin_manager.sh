@@ -153,14 +153,16 @@ szcdf_bin_manager__import() {
   fi
 
   if [[ -L "$dest_path" ]]; then
-    local current_target
-    current_target="$(readlink -f "$dest_path")"
-    if [[ "$current_target" == "$src_path" ]]; then
+    local current_src_target
+    current_src_target="$(readlink -f "$src_path")"
+    local current_dest_target
+    current_dest_target="$(readlink -f "$dest_path")"
+    if [[ "$current_src_target" == "$current_dest_target" ]]; then
       szcdf_logging__debug "Symlink '$dest_path' already points to '$src_path'. Skipping."
       SZCDF_BIN_MANAGER__IS_IMPORTED["$script_name"]=1
       return 0
     else
-      szcdf_logging__warning "Symlink '$dest_path' points to a different target ($current_target). Skipping."
+      szcdf_logging__warning "Symlink '$dest_path' points to a different target. (Current: $current_dest_target, Wanted: $current_src_target). Skipping."
       return 1
     fi
   fi

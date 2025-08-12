@@ -4,9 +4,17 @@ SHELL := /bin/bash
 .PHONY: install
 install:
 	@if [ -d ${HOME}/.local/bin ] && [ -x ${HOME}/.local/bin/szcdfi.sh ]; then \
-		${HOME}/.local/bin/szcdfi.sh; \
+		${HOME}/.local/bin/szcdfi.sh -p .; \
 	else \
-		./bin/szcdfi.sh; \
+		./bin/szcdfi.sh -p .; \
+	fi
+
+.PHONY: install-nointeractive
+install-nointeractive:
+	@if [ -d ${HOME}/.local/bin ] && [ -x ${HOME}/.local/bin/szcdfi.sh ]; then \
+		${HOME}/.local/bin/szcdfi.sh -p . -I -m 1; \
+	else \
+		./bin/szcdfi.sh -p . -I -m 1; \
 	fi
 
 .PHONY: enter-test-env

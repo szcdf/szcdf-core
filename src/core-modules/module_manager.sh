@@ -45,14 +45,14 @@ szcdf_module_manager() {
 # Initializes the module manager module
 # $# = 0
 szcdf_module_manager__init() {
-  declare -A SZCDF_MODULE__IS_SOURCING
-  declare -A SZCDF_MODULE__IS_SOURCED
+  declare -gA SZCDF_MODULE__IS_SOURCING
+  declare -gA SZCDF_MODULE__IS_SOURCED
 
-  declare -A SZCDF_MODULE__IS_INITING
-  declare -A SZCDF_MODULE__IS_INITED
+  declare -gA SZCDF_MODULE__IS_INITING
+  declare -gA SZCDF_MODULE__IS_INITED
 
-  declare -A SZCDF_MODULE__IS_LOADING
-  declare -A SZCDF_MODULE__IS_LOADED
+  declare -gA SZCDF_MODULE__IS_LOADING
+  declare -gA SZCDF_MODULE__IS_LOADED
 
   if [[ -z "$SZCDF_MODULES_LOADED" ]]; then
     SZCDF_MODULES_LOADED=( module_manager )

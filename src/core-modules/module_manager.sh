@@ -73,7 +73,7 @@ szcdf_module_manager__init() {
 szcdf_module_manager__is_loaded() {
   local module
   module=$1
-  if [[ "${SZCDF_MODULE__IS_LOADED[$module]+_}" ]]; then
+  if [[ -n "${SZCDF_MODULE__IS_LOADED[$module]+_}" ]]; then
     echo 1
     return 0
   else
@@ -96,7 +96,7 @@ szcdf_module_manager__load() {
   local script
 
   # Check if the module is already loaded
-  if [[ ${SZCDF_MODULE__IS_LOADED[$module]+_} ]] || [[ ${SZCDF_MODULE__IS_LOADING[$module]+_} ]]; then
+  if [[ -n ${SZCDF_MODULE__IS_LOADED[$module]+_} ]] || [[ -n ${SZCDF_MODULE__IS_LOADING[$module]+_} ]]; then
     szcdf_logging__warning "Module $module is already loaded. Skipping"
     return 1
   fi
@@ -131,7 +131,7 @@ szcdf_module_manager__load() {
   
   # Source the module's script
   szcdf_logging__debug "Checking if module $module is sourced..."
-  if [[ ${SZCDF_MODULE__IS_SOURCED[$module]+_} ]] || [[ ${SZCDF_MODULE__IS_SOURCING[$module]+_} ]]; then
+  if [[ -n ${SZCDF_MODULE__IS_SOURCED[$module]+_} ]] || [[ -n ${SZCDF_MODULE__IS_SOURCING[$module]+_} ]]; then
     szcdf_logging__debug "Module $module is already sourced. Skipping source..."
   else
     szcdf_logging__debug "Module $module is not yet sourced, so sourcing now (from $script)..."
@@ -144,7 +144,7 @@ szcdf_module_manager__load() {
 
   # Run init function if it exists
   szcdf_logging__debug "Checking if module $module needs to be inited..."
-  if [[ ${SZCDF_MODULE__IS_INITED[$module]+_} ]] || [[ ${SZCDF_MODULE__IS_INITING[$module]+_} ]]; then
+  if [[ -n ${SZCDF_MODULE__IS_INITED[$module]+_} ]] || [[ -n ${SZCDF_MODULE__IS_INITING[$module]+_} ]]; then
     szcdf_logging__debug "Module $module is already inited. Skipping init..."
   else
     szcdf_logging__debug "Module $module needs to be inited."
@@ -172,7 +172,7 @@ szcdf_module_manager__load() {
 # $# = 0
 # Export: szcdf_module_manager unload_all_loaded
 szcdf_module_manager__unload_all_loaded() {
-  while [[ ${SZCDF_MODULES_LOADED[0]+_} ]]; do
+  while [[ -n ${SZCDF_MODULES_LOADED[0]+_} ]]; do
     local module="${SZCDF_MODULES_LOADED[0]}"
     szcdf_module_manager__unload_impl
     SZCDF_MODULES_LOADED=("${SZCDF_MODULES_LOADED[@]:1}")
@@ -184,7 +184,7 @@ szcdf_module_manager__unload_all_loaded() {
 # Assumes $module is in scope
 szcdf_module_manager__unload_impl() {
   # Check if module is even loaded before trying to unload
-  if [[ ! ${SZCDF_MODULE__IS_LOADED[$module]+_} ]]; then
+  if [[ ! -n ${SZCDF_MODULE__IS_LOADED[$module]+_} ]]; then
     return 1
   fi
 

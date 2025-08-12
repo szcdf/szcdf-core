@@ -74,7 +74,7 @@ szcdf_preset__register() {
   local preset_name=$1
   shift
   # Check if preset is already registered
-  if [[ "${SZCDF_PRESET__IS_REGISTERED[$preset_name]+_}" == 1 ]]; then
+  if [[ -n "${SZCDF_PRESET__IS_REGISTERED[$preset_name]+_}" ]]; then
     szcdf_logging__warning "Preset '$preset_name' is already registered. Skipping."
     return
   fi
@@ -124,7 +124,7 @@ szcdf_preset__load_all_registered() {
       continue
     fi
     # Skip all presets that are registered as single scripts
-    if [[ ${SZCDF_PRESET__IS_REGISTERED_AS_SINGLE_SCRIPT[$preset_name]+_} ]]; then
+    if [[ -n ${SZCDF_PRESET__IS_REGISTERED_AS_SINGLE_SCRIPT[$preset_name]+_} ]]; then
       continue
     fi
     # Run the pre-any-load scripts
@@ -140,7 +140,7 @@ szcdf_preset__load_all_registered() {
       continue
     fi
     # If the preset is registered as a single script, load it directly
-    if [[ ${SZCDF_PRESET__IS_REGISTERED_AS_SINGLE_SCRIPT[$preset_name]+_} ]]; then
+    if [[ -n ${SZCDF_PRESET__IS_REGISTERED_AS_SINGLE_SCRIPT[$preset_name]+_} ]]; then
       szcdf_preset__run_load_single_script "$preset_name"
     # Otherwise, run the on-load scripts
     else
@@ -157,7 +157,7 @@ szcdf_preset__load_all_registered() {
       continue
     fi
     # Skip all presets that are registered as single scripts
-    if [[ ${SZCDF_PRESET__IS_REGISTERED_AS_SINGLE_SCRIPT[$preset_name]+_} ]]; then
+    if [[ -n ${SZCDF_PRESET__IS_REGISTERED_AS_SINGLE_SCRIPT[$preset_name]+_} ]]; then
       continue
     fi
     # Run the post-all-load scripts
@@ -167,7 +167,7 @@ szcdf_preset__load_all_registered() {
 
   # Step 4: Mark all successfully loaded presets as loaded
   for preset_name in "${SZCDF_PRESET__REGISTERED_PRESETS[@]}"; do
-    if [[ ! ${SZCDF_PRESET__HAD_FAILURE[$preset_name]+_} ]]; then
+    if [[ ! -n ${SZCDF_PRESET__HAD_FAILURE[$preset_name]+_} ]]; then
       szcdf_preset__mark_loaded "$preset_name"
     fi
   done
@@ -187,12 +187,12 @@ szcdf_preset__run_load_single_script() {
   local preset_name=$1
   shift
   # Check to make sure the preset has not been fully loaded yet
-  if [[ ${SZCDF_PRESET__IS_LOADED[$preset_name]+_} ]]; then
+  if [[ -n ${SZCDF_PRESET__IS_LOADED[$preset_name]+_} ]]; then
     szcdf_logging__debug "Preset '$preset_name' is loaded. Skipping load script."
     return
   fi
   # Check to make sure the preset hasn't hit had any failures
-  if [[ ${SZCDF_PRESET__HAD_FAILURE[$preset_name]+_} ]]; then
+  if [[ -n ${SZCDF_PRESET__HAD_FAILURE[$preset_name]+_} ]]; then
     return 1
   fi
   # Source the load script
@@ -222,12 +222,12 @@ szcdf_preset__run_load_stage() {
   local load_stage_name=$1
   shift
   # Check to make sure the preset has not been fully loaded yet
-  if [[ ${SZCDF_PRESET__IS_LOADED[$preset_name]+_} ]]; then
+  if [[ -n ${SZCDF_PRESET__IS_LOADED[$preset_name]+_} ]]; then
     szcdf_logging__debug "Preset '$preset_name' is loaded. Skipping $load_stage_name (load stage $load_stage_num) scripts."
     return
   fi
   # Check to make sure the preset hasn't hit had any failures
-  if [[ ${SZCDF_PRESET__HAD_FAILURE[$preset_name]+_} ]]; then
+  if [[ -n ${SZCDF_PRESET__HAD_FAILURE[$preset_name]+_} ]]; then
     return 1
   fi
   # Check if preset dir exists and set it
@@ -273,7 +273,7 @@ szcdf_preset__is_loaded() {
   local preset_name=$1
   shift
 
-  if [[ "${SZCDF_PRESET__LOADED_PRESETS[$preset_name]+_}" ]]; then
+  if [[ -n "${SZCDF_PRESET__LOADED_PRESETS[$preset_name]+_}" ]]; then
     echo 1
     return 0
   else

@@ -17,6 +17,16 @@ declare -A SZCDF_MODULE__IS_SOURCED
 declare -A SZCDF_MODULE__IS_INITED
 declare -A SZCDF_MODULE__IS_LOADED
 
+szcdf_debug_on() {
+  touch /tmp/SZCDF_G__DEBUG_MODE
+  export SZCDF_G__DEBUG_MODE=1
+}
+
+szcdf_debug_off() {
+  rm -f /tmp/SZCDF_G__DEBUG_MODE || true
+  unset SZCDF_G__DEBUG_MODE
+}
+
 szcdf_bootstrap__try_load_module() {
   local module=$1
   shift

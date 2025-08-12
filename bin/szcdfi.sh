@@ -247,11 +247,11 @@ szcdf_install__quick_install() {
   do
     szcdf_install__execute_spec_command $line
     execution_rc=$?
-    if [[ $preview_rc -eq $RC_SPEC_DIRECTIVE_EMPTY ]]; then
+    if [[ $execution_rc -eq $RC_SPEC_DIRECTIVE_EMPTY ]]; then
       continue
-    elif [[ $preview_rc -eq $RC_SPEC_DIRECTIVE_COMMENT ]]; then
+    elif [[ $execution_rc -eq $RC_SPEC_DIRECTIVE_COMMENT ]]; then
       continue
-    elif [[ $preview_rc -eq $RC_SPEC_DIRECTIVE_UNKNOWN ]]; then
+    elif [[ $execution_rc -eq $RC_SPEC_DIRECTIVE_UNKNOWN ]]; then
       continue
     elif [[ $execution_rc -ne 0 ]]; then
       echo "An error was encountered when executing install spec file on step $step_counter: rc=$execution_rc"

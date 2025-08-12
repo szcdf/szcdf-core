@@ -160,7 +160,7 @@ szcdf_install__main() {
   # If install mode is not specified, determine it
   if [[ -z "$INSTALL_MODE" ]]; then
     # If non-interactive, stop because install mode is required
-    if [[ "$IS_INTERACTIVE" == "0"]]; then
+    if [[ "$IS_INTERACTIVE" == "0" ]]; then
       szcdf_install__display_error "Install mode is required in non-interactive mode."
       return $ERROR_FATAL
     else

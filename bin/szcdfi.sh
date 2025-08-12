@@ -157,11 +157,16 @@ szcdf_install__main() {
 
   szcdf_install__display_intro
 
-  # If install mode is not specified, prompt user
+  # If install mode is not specified, determine it
   if [[ -z "$INSTALL_MODE" ]]; then
-    szcdf_install__prompt_install_mode INSTALL_MODE
-  
-  # Otherwise, use the user-inputted values
+    # If non-interactive, stop because install mode is required
+    if [[ "$IS_INTERACTIVE" == "0"]]; then
+      szcdf_install__display_error "Install mode is required in non-interactive mode."
+      return $ERROR_FATAL
+    else
+      # Otherwise, prompt user
+      szcdf_install__prompt_install_mode INSTALL_MODE
+    fi
   fi
 
   # Execute
@@ -234,9 +239,11 @@ szcdf_install__quick_install() {
 
   echo ""
 
-  if ! szcdf_install__prompt_confirmation_is_yes "Continue with the install?"; then
-    echo "Aborting install...."
-    return 1
+  if [[ "$IS_INTERACTIVE" == "1" ]]; then
+    if ! szcdf_install__prompt_confirmation_is_yes "Continue with the install?"; then
+      echo "Aborting install...."
+      return 1
+    fi
   fi
 
   echo ""
@@ -625,15 +632,24 @@ szcdf_install__execute_copy() {
         return 0
       fi
       local prompt_text
-      prompt_text=$(echo -en \
-        "$(szcdf_install__display_output "The installer wants to replace the file '$dest_':")""\n"\
-        "$(szcdf_install__display_output_append "Old target: $(tput setaf 1)$old_link_target$(tput sgr0)")""\n"\
-        "$(szcdf_install__display_output_append "New target: $(tput setaf 2)$PKG_DIR/$source_$(tput sgr0)")""\n"\
-        "$(szcdf_install__display_output_append "Replace?")"\
-      )
-      if ! szcdf_install__prompt_confirmation_is_yes "$prompt_text"; then
-        szcdf_install__display_warning "$dest_ will not be created."
-        return
+      if [[ "$IS_INTERACTIVE" == "1" ]]; then
+        prompt_text=$(echo -en \
+          "$(szcdf_install__display_output "The installer wants to replace the file '$dest_':")""\n"\
+          "$(szcdf_install__display_output_append "Old target: $(tput setaf 1)$old_link_target$(tput sgr0)")""\n"\
+          "$(szcdf_install__display_output_append "New target: $(tput setaf 2)$PKG_DIR/$source_$(tput sgr0)")""\n"\
+          "$(szcdf_install__display_output_append "Replace?")"\
+        )
+        if ! szcdf_install__prompt_confirmation_is_yes "$prompt_text"; then
+          szcdf_install__display_warning "$dest_ will not be created."
+          return
+        fi
+      else
+        prompt_text=$(echo -en \
+          "$(szcdf_install__display_warning "The installer will replace the file '$dest_':")""\n"\
+          "$(szcdf_install__display_warning_append "Old target: $(tput setaf 1)$old_link_target$(tput sgr0)")""\n"\
+          "$(szcdf_install__display_warning_append "New target: $(tput setaf 2)$PKG_DIR/$source_$(tput sgr0)")"\
+        )
+        echo "$prompt_text"
       fi
       rm -rf "$dest_"
     else
@@ -643,15 +659,24 @@ szcdf_install__execute_copy() {
         local link_target
         link_target="$(readlink -f "$dest_")"
         local prompt_text
-        prompt_text=$(echo -en \
-          "$(szcdf_install__display_output "The installer wants to replace the symbolic link '$dest_':")""\n"\
-          "$(szcdf_install__display_output_append "Old link target: $(tput setaf 1)$link_target$(tput sgr0)")""\n"\
-          "$(szcdf_install__display_output_append "New regular file from: $(tput setaf 2)$PKG_DIR/$source_$(tput sgr0)")""\n"\
-          "$(szcdf_install__display_output_append "Replace?")"\
-        )
-        if ! szcdf_install__prompt_confirmation_is_yes "$prompt_text"; then
-          szcdf_install__display_warning "$dest_ will not be created."
-          return
+        if [[ "$IS_INTERACTIVE" == "1" ]]; then
+          prompt_text=$(echo -en \
+            "$(szcdf_install__display_output "The installer wants to replace the symbolic link '$dest_':")""\n"\
+            "$(szcdf_install__display_output_append "Old link target: $(tput setaf 1)$link_target$(tput sgr0)")""\n"\
+            "$(szcdf_install__display_output_append "New regular file from: $(tput setaf 2)$PKG_DIR/$source_$(tput sgr0)")""\n"\
+            "$(szcdf_install__display_output_append "Replace?")"\
+          )
+          if ! szcdf_install__prompt_confirmation_is_yes "$prompt_text"; then
+            szcdf_install__display_warning "$dest_ will not be created."
+            return
+          fi
+        else
+          prompt_text=$(echo -en \
+            "$(szcdf_install__display_warning "The installer will replace the symbolic link '$dest_':")""\n"\
+            "$(szcdf_install__display_warning_append "Old link target: $(tput setaf 1)$link_target$(tput sgr0)")""\n"\
+            "$(szcdf_install__display_warning_append "New regular file from: $(tput setaf 2)$PKG_DIR/$source_$(tput sgr0)")"\
+          )
+          echo "$prompt_text"
         fi
         rm -rf "$dest_"
       else
@@ -669,14 +694,22 @@ szcdf_install__execute_copy() {
           fi
         fi
         local prompt_text
-        prompt_text=$(echo -en \
-          "$(szcdf_install__display_output "The installer wants to replace the file '$dest_':")""\n"\
-          "$(szcdf_install__display_output_append "New contents from: $(tput setaf 2)$PKG_DIR/$source_$(tput sgr0)")""\n"\
-          "$(szcdf_install__display_output_append "Replace?")"\
-        )
-        if ! szcdf_install__prompt_confirmation_is_yes "$prompt_text"; then
-          szcdf_install__display_warning "$dest_ will not be created."
-          return
+        if [[ "$IS_INTERACTIVE" == "1" ]]; then
+          prompt_text=$(echo -en \
+            "$(szcdf_install__display_output "The installer wants to replace the file '$dest_':")""\n"\
+            "$(szcdf_install__display_output_append "New contents from: $(tput setaf 2)$PKG_DIR/$source_$(tput sgr0)")""\n"\
+            "$(szcdf_install__display_output_append "Replace?")"\
+          )
+          if ! szcdf_install__prompt_confirmation_is_yes "$prompt_text"; then
+            szcdf_install__display_warning "$dest_ will not be created."
+            return
+          fi
+        else
+          prompt_text=$(echo -en \
+            "$(szcdf_install__display_warning "The installer will replace the file '$dest_':")""\n"\
+            "$(szcdf_install__display_warning_append "New contents from: $(tput setaf 2)$PKG_DIR/$source_$(tput sgr0)")"\
+          )
+          echo "$prompt_text"
         fi
         # cp will overwrite with -f, no need to remove explicitly
       fi
@@ -1051,6 +1084,10 @@ szcdf_install__display_output_append() {
 
 szcdf_install__display_warning() {
   echo "$(tput setaf 3)$*$(tput sgr0)"
+}
+
+szcdf_install__display_warning_append() {
+  echo "    $(tput setaf 3)$*$(tput sgr0)"
 }
 
 szcdf_install__display_error() {

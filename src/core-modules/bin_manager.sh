@@ -55,7 +55,7 @@ szcdf_bin_manager() {
 # Initializes the bin_manager module
 # $# = 0
 szcdf_bin_manager__init() {
-  declare -A SZCDF_BIN_MANAGER__IS_IMPORTED
+  declare -gA SZCDF_BIN_MANAGER__IS_IMPORTED
 
   # Ensure destination bin directory exists and is on PATH
   local dest_bin_dir
@@ -115,7 +115,7 @@ szcdf_bin_manager__list() {
 # $1 = script file name inside bin (basename)
 szcdf_bin_manager__import() {
   if ! declare -p SZCDF_BIN_MANAGER__IS_IMPORTED >/dev/null 2>&1; then
-    declare -A SZCDF_BIN_MANAGER__IS_IMPORTED
+    declare -gA SZCDF_BIN_MANAGER__IS_IMPORTED
   fi
   local script_name=$1
   shift || true

@@ -17,7 +17,7 @@
 # Initializes the logging module
 # $# = 0
 szcdf_logging__init() {
-  declare -a SZCDF_LOGGING__CONTEXT_STACK
+  declare -ga SZCDF_LOGGING__CONTEXT_STACK
   if [[ ${#SZCDF_LOGGING__CONTEXT_STACK[@]} -eq 0 ]]; then
     SZCDF_LOGGING__CONTEXT_STACK[0]=base
   fi

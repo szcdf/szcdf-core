@@ -723,7 +723,7 @@ szcdf_install__execute_copy() {
   if [[ "$INSTALL_EDITABLE" == 1 ]]; then
     ln -vs "$PKG_DIR/$source_" "$dest_"
   else
-    cp -vfr "$PKG_DIR/$source_" "$dest_"
+    cp -vfrT "$PKG_DIR/$source_" "$dest_"
   fi
 }
 

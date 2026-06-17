@@ -85,7 +85,11 @@ fi
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
 # Set default editor -- always vim <3
-export EDITOR=vim
+if which vim >/dev/null 2>&1; then
+  export EDITOR=vim
+else
+  export EDITOR=vi
+fi
 
 # ls should use colour
 alias ls='ls --color=auto'

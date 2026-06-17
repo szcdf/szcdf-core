@@ -15,7 +15,7 @@ szcdf_preset register add-bash-recommended
 szcdf_preset register add-wsl-recommended
 szcdf_preset register add-zhaonetwork1-accessor
 szcdf_preset register add-vim-managed
-szcdf_preset register add-conda-recommended
+szcdf_preset register add-pyenv
 szcdf_preset register add-nodejs-dev
 szcdf_preset register add-ssh-ids-to-keychain
 szcdf_preset register use-nord-theme
@@ -35,10 +35,21 @@ szcdf_logging__debug "Adding some common aliases..."
 alias cdprl='cd /home/stephen/projects'
 alias cdprw='cd /mnt/e/Projects/Dev'
 
+alias firefox='powershell.exe -Command "& \"C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Firefox.lnk\""'
+alias discord='powershell.exe -Command "& \"C:\Users\Stephen Zhao\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Discord Inc\Discord.lnk\""'
+
+szcdf_logging__debug "Finished adding some common aliases."
+
+szcdf_logging__debug "Adding symlinks..."
+
 szcdf_module_manager load link_syncer
 szcdf_link_syncer ensure_link \
   "$SZCDF_G__ROOT_DIR/data/mail_zhaostephen_com.gitconfig" \
   "$HOME/.gitconfig"
+
+szcdf_logging__debug "Finished adding symlinks."
+
+szcdf_logging__debug "Adding text sections..."
 
 szcdf_module_manager load text_section_syncer
 szcdf_text_section_syncer ensure_text_section_or_prepend \
@@ -46,6 +57,6 @@ szcdf_text_section_syncer ensure_text_section_or_prepend \
   "$SZCDF_G__ROOT_DIR/data/mail_zhaostephen_com.github.sshconfig" \
   "SSHCONFIG_GITHUB_MAIL_ZHAOSTEPEN_COM"
 
-szcdf_logging__debug "Finished adding some common aliases."
+szcdf_logging__debug "Finished adding text sections."
 
 szcdf_logging__end_context

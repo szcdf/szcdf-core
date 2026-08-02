@@ -59,7 +59,9 @@ $stub = "@$importPath"
 # Idempotency: if the target already contains exactly our stub, do nothing.
 # Trim tolerates a trailing newline and a possible leading BOM from an older write.
 if (Test-Path -LiteralPath $TargetPath) {
-    $existing = (Get-Content -LiteralPath $TargetPath -Raw -ErrorAction SilentlyContinue)
+    # -Encoding UTF8: Windows PowerShell 5.1 otherwise reads as ANSI and would
+    # mis-compare a UTF-8 stub (our writer emits UTF-8 without BOM).
+    $existing = (Get-Content -LiteralPath $TargetPath -Raw -Encoding UTF8 -ErrorAction SilentlyContinue)
     if ($null -ne $existing -and $existing.Trim([char]0xFEFF, "`r", "`n", ' ', "`t") -eq $stub) {
         Write-Output "Managed CLAUDE.md already points to '$importPath'. Skipping."
         return

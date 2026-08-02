@@ -107,6 +107,32 @@ Adopt a **split-by-effect-type** architecture, not a per-shell rewrite of the wh
     - Add a Windows CI runner that runs `bin/szcdfi.ps1` against the manifest.
     - Assert the same result tree that `test/installer` asserts on Linux.
 
+## Text encoding and line endings (installer parity)
+
+- All PowerShell text writers emit UTF-8 WITHOUT a BOM.
+  - A BOM before the first line breaks Claude Code's `@import` parsing.
+  - No-BOM also matches the byte output of `szcdfi.sh`.
+- All content reads pass `-Encoding UTF8`.
+  - Windows PowerShell 5.1 otherwise decodes with the system ANSI code page.
+  - That would mojibake-corrupt any non-ASCII content in a file it edits (for example a user's `$PROFILE`).
+- `PREPENDTEXT` / `APPENDTEXT` preserve the destination file's dominant EOL.
+  - A pre-existing CRLF file stays CRLF; a new file defaults to LF.
+  - This avoids silently normalizing untouched user lines, and matches the Bash `awk`-replace path, which also keeps the destination EOL.
+
+## Known parity limitations (Phase 2 backlog)
+
+- New-section insert vs a source file with no trailing newline.
+  - `szcdfi.sh` `cat`s the source, so a source without a final newline glues the END marker onto the source's last line.
+  - `szcdfi.ps1` always places the END marker on its own line (the correct behavior).
+  - The Bash new-section path is internally inconsistent (its `awk`-replace path adds a newline).
+  - Resolution: fix `szcdfi.sh` to add the newline; do NOT replicate the Bash gluing bug.
+  - Not reachable today: every referenced source file ends in LF.
+- Copy over an existing symlink destination (editable/dev flows).
+  - `szcdfi.sh` replaces a symlink destination with a regular file even when contents match.
+  - `szcdfi.ps1` currently keeps the symlink when the linked content hashes equal.
+  - Low impact: Windows symlinks need Developer Mode or admin, so this is a dev-only path.
+  - Resolution: add explicit symlink-type detection to `Copy-One` in Phase 2.
+
 ## The Windows managed `CLAUDE.md`: why an import stub, not a symlink
 
 - The Bash path provisions `~/.claude/CLAUDE.md` with a symlink via `link_syncer`.

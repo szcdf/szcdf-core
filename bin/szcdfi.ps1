@@ -31,15 +31,30 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-# Write text as UTF-8 WITHOUT a BOM and with LF line endings, to match the
-# byte output of bin/szcdfi.sh (awk/printf/cat). A BOM would, for example,
-# break Claude Code's `@import` parsing when it precedes the first line.
-function Write-TextFileLf {
-    param([string] $Path, [string[]] $Lines)
-    $content = ($Lines -join "`n")
-    if ($content.Length -gt 0) { $content += "`n" }
+# Write text as UTF-8 WITHOUT a BOM, to match the byte output of bin/szcdfi.sh
+# (awk/printf/cat). A BOM would, for example, break Claude Code's `@import`
+# parsing when it precedes the first line.
+#
+# $Newline defaults to LF (bash's byte style). Callers editing an EXISTING file
+# should pass that file's dominant EOL so pre-existing user content is not
+# silently normalized (bash's awk-replace path likewise preserves the dest EOL).
+function Write-TextFile {
+    param([string] $Path, [string[]] $Lines, [string] $Newline = "`n")
+    $content = ($Lines -join $Newline)
+    if ($content.Length -gt 0) { $content += $Newline }
     $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
     [System.IO.File]::WriteAllText($Path, $content, $utf8NoBom)
+}
+
+# Detect the dominant line ending of an existing text file: CRLF if any CRLF is
+# present, else LF. Returns LF for a missing/empty file (bash's default style).
+function Get-DominantNewline {
+    param([string] $Path)
+    if (Test-Path -LiteralPath $Path -PathType Leaf) {
+        $raw = [System.IO.File]::ReadAllText($Path)
+        if ($raw -match "`r`n") { return "`r`n" }
+    }
+    return "`n"
 }
 
 # The shell identity this installer answers to, for guard matching.
@@ -153,7 +168,11 @@ function Get-SectionMarkers {
 function Read-Lines {
     param([string] $Path)
     if (Test-Path -LiteralPath $Path -PathType Leaf) {
-        return @(Get-Content -LiteralPath $Path)
+        # -Encoding UTF8 is REQUIRED: Windows PowerShell 5.1 otherwise decodes
+        # with the system ANSI code page, which mojibake-corrupts UTF-8 content
+        # (our writers emit UTF-8 without BOM). 5.1 -Encoding UTF8 decodes UTF-8
+        # correctly and still honors a BOM if one is present.
+        return @(Get-Content -LiteralPath $Path -Encoding UTF8)
     }
     return @()
 }
@@ -186,6 +205,9 @@ function Invoke-InsertText {
     $m = Get-SectionMarkers -CommentIndicator $comment -SectionId $sectionId
     $srcLines = Read-Lines -Path $srcAbs
     $destLines = Read-Lines -Path $destAbs
+    # Preserve the destination's existing EOL so untouched user lines are not
+    # silently converted (a brand-new file defaults to LF, bash's byte style).
+    $nl = Get-DominantNewline -Path $destAbs
 
     $hasBegin = $destLines -contains $m.Begin
     $hasEnd = $destLines -contains $m.End
@@ -207,7 +229,7 @@ function Invoke-InsertText {
             }
             $result.Add($line)
         }
-        Write-TextFileLf -Path $destAbs -Lines $result
+        Write-TextFile -Path $destAbs -Lines $result -Newline $nl
     } else {
         $section = New-Object System.Collections.Generic.List[string]
         $section.Add($m.Begin)
@@ -223,7 +245,7 @@ function Invoke-InsertText {
             foreach ($line in $destLines) { $result.Add($line) }
             foreach ($s in $section) { $result.Add($s) }
         }
-        Write-TextFileLf -Path $destAbs -Lines $result
+        Write-TextFile -Path $destAbs -Lines $result -Newline $nl
     }
     Write-Output "  ${Position}ed section '$sectionId' -> $destAbs"
 }
@@ -277,7 +299,7 @@ function Invoke-SzcdfInstall {
     Write-Output "Mode        : $Mode$(if ($Editable) { ' (editable/symlink)' } else { '' })"
     Write-Output ''
 
-    $lines = Get-Content -LiteralPath $Spec
+    $lines = Get-Content -LiteralPath $Spec -Encoding UTF8
     $step = 0
     foreach ($line in $lines) {
         $directive = Get-ActiveDirective -Line $line

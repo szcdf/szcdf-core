@@ -1,0 +1,27 @@
+###############################################################################
+#
+# Package: szcdf-core
+# Author: Stephen Zhao (mail@zhaostephen.com)
+# Type: SZCDF Install Spec (Windows / PowerShell, Phase 1 prototype)
+#
+# Read by bin/szcdfi.ps1. This is a CURATED Windows spec so that Phase 1 does
+# not touch the proven Bash flow in `.szcdfis`. Phase 2 converges to a single
+# manifest once the Bash installer learns to treat `#@bash` as active (see
+# ADR 0001).
+#
+# Guard syntax:
+#   `#@pwsh <DIRECTIVE> ...`  -> active for the PowerShell installer only.
+#   `#@bash <DIRECTIVE> ...`  -> ignored by the PowerShell installer.
+#   `<DIRECTIVE> ...`         -> shared; processed by every installer.
+#   `# ...`                   -> ordinary comment.
+
+# === Shared: install managed data + presets into the config root ===
+COPYALL src/core-data $CONFIG_ROOT/data
+COPYALL src/core-presets $CONFIG_ROOT/presets
+
+# === SZCDF entries (PowerShell) ===
+# Wire the PowerShell entry point into the user's profile (all hosts).
+#@pwsh PREPENDTEXT src/core-entries/entry-pwsh.ps1 $PROFILE ENTRY-PWSH
+
+# === Bash-only lines (ignored by the PowerShell installer) ===
+#@bash PREPENDTEXT src/core-entries/entry-bash.sh $HOME/.bashrc ENTRY-BASH

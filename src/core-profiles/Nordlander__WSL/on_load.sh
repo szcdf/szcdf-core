@@ -18,6 +18,7 @@ szcdf_preset register add-vim-managed
 szcdf_preset register add-pyenv
 szcdf_preset register add-nodejs-dev
 szcdf_preset register add-ssh-ids-to-keychain
+szcdf_preset register add-claude-md-managed
 szcdf_preset register use-nord-theme
 szcdf_preset register set-shell-prompt-powerline-blue
 

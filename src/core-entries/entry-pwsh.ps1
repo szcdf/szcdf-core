@@ -12,7 +12,7 @@
 #   2. dot-sources any generated session snippets under `<root>/env.d/*.ps1`.
 #
 # Session-shaping logic is expected to be GENERATED into env.d/*.ps1 by the
-# neutral core (see ADR 0001). Keeping this file thin is deliberate: the
+# neutral core (see szcdf-szsdlc ADR-0001). Keeping this file thin is deliberate: the
 # per-shell surface must stay small.
 
 # Only run this if we have not hit an entry point yet (mirrors entry-bash.sh).

@@ -7,7 +7,7 @@
 # Read by bin/szcdfi.ps1. This is a CURATED Windows spec so that Phase 1 does
 # not touch the proven Bash flow in `.szcdfis`. Phase 2 converges to a single
 # manifest once the Bash installer learns to treat `#@bash` as active (see
-# ADR 0001).
+# szcdf-szsdlc ADR-0001).
 #
 # Guard syntax:
 #   `#@pwsh <DIRECTIVE> ...`  -> active for the PowerShell installer only.

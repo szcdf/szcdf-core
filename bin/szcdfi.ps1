@@ -11,7 +11,7 @@
 #   COPY, COPYALL, PREPENDTEXT, APPENDTEXT
 #
 # It additionally understands shell GUARDS so one manifest can serve every
-# installer (see ADR 0001):
+# installer (see szcdf-szsdlc ADR-0001):
 #   `#@pwsh <DIRECTIVE> ...`  -> active for THIS installer only.
 #   `#@<other> <DIRECTIVE>`   -> ignored by THIS installer.
 #   `<DIRECTIVE> ...`         -> shared; processed by every installer.

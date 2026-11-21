@@ -1,14 +1,28 @@
+# WSL global git config (symlinked to ~/.gitconfig by the profile).
+# Shared Windows+WSL settings live in the Windows-side shared.gitconfig;
+# only WSL-specific settings belong here (after the include so they win).
+
+# Fallback identity if the shared file is missing (a missing include is
+# silently ignored); the include below overrides it when present.
 [user]
 	name = Stephen Zhao
 	email = mail@zhaostephen.com
-[push]
-	default = matching
-[color]
-  ui = auto
+
+[include]
+	path = "/mnt/c/Users/Stephen Zhao/.config/git/shared.gitconfig"
+
 [diff "pdfconv"]
-	textconv=pdftohtml -stdout -i
+	textconv = pdftohtml -stdout -i
+
+# Other HTTPS hosts: Windows Git Credential Manager (Git for Windows now
+# ships it under ucrt64; the old mingw64/libexec path no longer exists).
 [credential]
-	helper = /mnt/c/Program\\ Files/Git/mingw64/libexec/git-core/git-credential-manager.exe
-[init]
-  defaultBranch = main
-	
+	helper = /mnt/c/Program\\ Files/Git/ucrt64/bin/git-credential-manager.exe
+
+# GitHub over HTTPS: use gh's token (passwordless). SSH is the primary path.
+[credential "https://github.com"]
+	helper =
+	helper = !/usr/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper =
+	helper = !/usr/bin/gh auth git-credential

@@ -10,6 +10,10 @@ git clone git@github.com:szcdf/szcdf-core.git && cd szcdf-core && make install
 ```
 Then follow the instructions in the installer.
 
+## Personal packages
+
+szcdf-core holds only the shared parts: installer, modules, generic presets, the `default` and `szcdf_tester` profiles, and the files they use. Machine-specific profiles, presets and data live in separate personal packages. Each has its own `.szcdfis` and installs into the same config root after szcdf-core (`~/.local/bin/szcdfi.sh -p <package-dir>`). The installer copies entry by entry and never clears a folder, so the packages coexist as long as file names don't collide.
+
 ## How to Develop
 
 ### How to Test

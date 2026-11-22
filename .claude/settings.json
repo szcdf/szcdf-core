@@ -1,0 +1,7 @@
+{
+  "env": {
+    "SZSDLC_BACKEND": "git",
+    "SZSDLC_BACKEND_GIT_URL": "git@github.com:szcdf/szcdf-szsdlc.git",
+    "SZSDLC_BACKEND_GIT_BRANCH": "main"
+  }
+}
